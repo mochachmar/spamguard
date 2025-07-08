@@ -1,0 +1,5 @@
+{
+  "name": "SpamGuard",
+  "description": "A dashboard to monitor and manage spam detection performance, providing detailed analytics, message classification, and system notifications.",
+  "requestFramePermissions": []
+}
