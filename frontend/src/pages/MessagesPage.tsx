@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Message } from '../../types';
-import { SearchIcon, ChevronDownIcon } from '../icons/InterfaceIcons';
+import { SearchIcon, ChevronDownIcon } from '../components/icons/InterfaceIcons';
 
 const mockMessages: Message[] = [
     { id: 'MSG001', sender: 'Jack', category: 'Spam', date: '2024-01-15', status: 'Detected', fromEmail: 'jack.s@example.com', content: 'Hello, I hope this message finds you well. I am writing to you regarding our upcoming meeting scheduled for next week. Please find attached the agenda for your review. Let me know if you have any questions or need further clarification. Best regards, Alice' },

@@ -1,18 +1,18 @@
 
 import React, { useState, useCallback } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
-import DashboardLayout from './components/layouts/DashboardLayout';
-import PublicLayout from './components/layouts/PublicLayout';
-import DashboardPage from './components/pages/DashboardPage';
-import MessagesPage from './components/pages/MessagesPage';
-import FeedbackPage from './components/pages/FeedbackPage';
-import SettingsPage from './components/pages/SettingsPage';
-import NotificationsPage from './components/pages/NotificationsPage';
-import LandingPage from './components/pages/LandingPage';
-import LoginPage from './components/pages/LoginPage';
-import RegisterPage from './components/pages/RegisterPage';
-import ForgotPasswordPage from './components/pages/ForgotPasswordPage';
-import CheckEmailPage from './components/pages/CheckEmailPage';
+import DashboardLayout from './src/components/layouts/DashboardLayout';
+import PublicLayout from './src/components/layouts/PublicLayout';
+import DashboardPage from './src/pages/DashboardPage';
+import MessagesPage from './src/pages/MessagesPage';
+import FeedbackPage from './src/pages/FeedbackPage';
+import SettingsPage from './src/pages/SettingsPage';
+import NotificationsPage from './src/pages/NotificationsPage';
+import LandingPage from './src/pages/LandingPage';
+import LoginPage from './src/pages/LoginPage';
+import RegisterPage from './src/pages/RegisterPage';
+import ForgotPasswordPage from './src/pages/ForgotPasswordPage';
+import CheckEmailPage from './src/pages/CheckEmailPage';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);

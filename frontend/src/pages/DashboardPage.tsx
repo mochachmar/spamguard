@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, BarChart, Bar, CartesianGrid } from 'recharts';
-import { ArrowUpIcon, ArrowDownIcon } from '../icons/InterfaceIcons';
+import { ArrowUpIcon, ArrowDownIcon } from '../components/icons/InterfaceIcons';
 import { Notification } from '../../types';
 
 const kpiData = [

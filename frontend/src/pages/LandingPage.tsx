@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LightningBoltIcon, ShieldCheckIcon as ShieldIcon, UserGroupIcon, UploadIcon, CheckCircleIcon } from '../icons/InterfaceIcons';
+import { LightningBoltIcon, ShieldCheckIcon as ShieldIcon, UserGroupIcon, UploadIcon, CheckCircleIcon } from '../components/icons/InterfaceIcons';
 
 const FeatureCard: React.FC<{ icon: React.ReactNode; title: string; description: string }> = ({ icon, title, description }) => (
   <div className="bg-white p-8 rounded-xl shadow-sm text-center items-center flex flex-col">

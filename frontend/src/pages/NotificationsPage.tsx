@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { NotificationItem } from '../../types';
-import { BellIcon, CloseIcon } from '../icons/InterfaceIcons';
+import { BellIcon, CloseIcon } from '../components/icons/InterfaceIcons';
 
 const initialNotifications: NotificationItem[] = [
     { id: 1, title: 'System Alert', context: 'Context: Unusual login attempts detected. Action: IP address blocked. Outcome: Potential threat neutralized.', time: '10:30 AM - A critical system alert was triggered due to unusual activity. Our system automatically blocked the suspicious IP address to prevent potential threats.' },
