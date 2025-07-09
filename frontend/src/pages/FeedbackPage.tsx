@@ -22,7 +22,7 @@ const FeedbackPage: React.FC = () => {
 
             <div className="bg-white p-8 rounded-lg shadow-sm">
                 <h2 className="text-xl font-bold text-gray-900">Classify Messages</h2>
-                <p className="mt-1 text-gray-600 text-sm">Classify messages as spam or non-spam to improve detection accuracy. Use the 'Report' button for unknown messages.</p>
+                <p className="mt-1 text-gray-600 text-sm">Classify messages as spam or suspicious to improve detection accuracy. Use the 'Report' button for unknown messages.</p>
                 <div className="mt-6 space-y-4">
                     <div>
                         <label htmlFor="messageId" className="block text-sm font-medium text-gray-700">Select message ID</label>
@@ -35,6 +35,8 @@ const FeedbackPage: React.FC = () => {
                     <div className="flex items-center space-x-3">
                          <button className="px-4 py-2 bg-slate-700 text-white font-medium rounded-md hover:bg-slate-600 transition-colors">Mark as Spam</button>
                          <button className="px-4 py-2 bg-gray-200 text-gray-800 font-medium rounded-md hover:bg-gray-300 transition-colors">Mark as Not Spam</button>
+                    </div>
+                    <div className="flex items-center space-x-3">
                          <button className="px-4 py-2 bg-gray-200 text-gray-800 font-medium rounded-md hover:bg-gray-300 transition-colors">Report</button>
                     </div>
                 </div>

@@ -9,7 +9,7 @@ export interface Notification {
 export interface Message {
   id: string;
   sender: string;
-  category: 'Spam' | 'Non-Spam';
+  category: 'Spam' | 'Suspicious';
   fraudType?: 'Phishing' | 'Malware' | 'Scams' | 'Other' | 'N/A';
   date: string;
   status: 'Detected' | 'Not Detected';
