@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LightningBoltIcon, ShieldCheckIcon as ShieldIcon, UserGroupIcon, UploadIcon, CheckCircleIcon } from '../components/icons/InterfaceIcons';
+import { LightningBoltIcon, ShieldCheckIcon as ShieldIcon, UserGroupIcon, UploadIcon, CheckCircleIcon, ExclamationCircleIcon, XCircleIcon} from '../components/icons/InterfaceIcons';
 
 const FeatureCard: React.FC<{ icon: React.ReactNode; title: string; description: string }> = ({ icon, title, description }) => (
   <div className="bg-white p-8 rounded-xl shadow-sm text-center items-center flex flex-col">
@@ -24,6 +24,73 @@ const StatItem: React.FC<{ value: string; label: string }> = ({ value, label }) 
   </div>
 );
 
+const AnalysisResult: React.FC<{ 
+  type: 'Normal' | 'Promo' | 'Fraud';
+  title: string;
+  accuracy: string;
+  analysisPoints: string[];
+  recommendations: string[];
+}> = ({ type, title, accuracy, analysisPoints, recommendations }) => {
+  // Determine styling based on result type
+  let bgColor, borderColor, textColor, icon;
+  switch (type) {
+    case 'Normal':
+      bgColor = 'bg-green-50';
+      borderColor = 'border-green-200';
+      textColor = 'text-green-800';
+      icon = <CheckCircleIcon className="h-5 w-5 text-green-500" />;
+      break;
+    case 'Promo':
+      bgColor = 'bg-blue-50';
+      borderColor = 'border-blue-200';
+      textColor = 'text-blue-800';
+      icon = <CheckCircleIcon className="h-5 w-5 text-blue-500" />;
+      break;
+    case 'Fraud':
+      bgColor = 'bg-red-50';
+      borderColor = 'border-red-200';
+      textColor = 'text-red-800';
+      icon = <XCircleIcon className="h-5 w-5 text-red-500" />;
+      break;
+    default:
+      bgColor = 'bg-gray-50';
+      borderColor = 'border-gray-200';
+      textColor = 'text-gray-800';
+  }
+
+  return (
+    <div className={`mt-6 border rounded-lg p-6 ${bgColor} ${borderColor}`}>
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center gap-2">
+          {icon}
+          <h3 className={`text-lg font-bold ${textColor}`}>{title}</h3>
+        </div>
+        <span className="text-xs px-2 py-1 rounded-full bg-white">
+          Accuracy: {accuracy}
+        </span>
+      </div>
+
+      <h4 className="font-semibold text-gray-900 mb-2">AI Analysis</h4>
+      <ol className="list-decimal pl-5 space-y-2 mb-4">
+        {analysisPoints.map((point, index) => (
+          <li key={index} className="text-gray-700">{point}</li>
+        ))}
+      </ol>
+
+      <hr className="my-4 border-gray-300" />
+
+      <div>
+        <h4 className="font-semibold text-gray-900 mb-2">Recommendation</h4>
+        <ol className="list-decimal pl-5 space-y-1">
+          {recommendations.map((rec, index) => (
+            <li key={index} className="text-gray-700">{rec}</li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  );
+};
+
 const LandingPage: React.FC = () => {
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -36,11 +103,78 @@ const LandingPage: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleDetectSpam = async () => {
+const handleDetectSpam = async () => {
     if (!message.trim()) return;
 
     setIsLoading(true);
     setResult(null);
+
+    // Simulate API call with timeout
+    setTimeout(() => {
+      // Determine result type based on message content (dummy logic)
+      let detectionResult: 'Normal' | 'Promo' | 'Fraud';
+      
+      if (message.includes('wawancara') || message.includes('interview')) {
+        detectionResult = 'Normal';
+      } else if (message.includes('promo') || message.includes('discount')) {
+        detectionResult = 'Promo';
+      } else if (message.includes('transfer') || message.includes('klik')) {
+        detectionResult = 'Fraud';
+      } else {
+        // Random result if no keywords match
+        const results: ('Normal' | 'Promo' | 'Fraud')[] = ['Normal', 'Promo', 'Fraud'];
+        detectionResult = results[Math.floor(Math.random() * results.length)];
+      }
+
+      setResult(detectionResult);
+      setIsLoading(false);
+    }, 1500);
+  };
+
+  // Dummy data for different result types
+  const normalResult = {
+    type: 'Normal' as const,
+    title: 'Normal (Not Spam)',
+    accuracy: 'Tinggi (99%)',
+    analysisPoints: [
+      'Pesan ini menggunakan bahasa formal, menyebutkan posisi yang spesifik ("Staff Administrasi"), dan memberikan detali waktu serta lokasi wawancara.',
+      'Terdeteksi nama perusahaan "PT. Jaya Abadi" dan pengirim "HRD PT. Jaya Abadi".',
+      'Tidak ada indikator mencurigakan seperti permintaan transfer uang, klaim gaji tidak masuk akal, atau tautan yang mencurigakan.'
+    ],
+    recommendations: [
+      'Anda dapat membalas pesan ini untuk mengonfirmasi kehadiran wawancara Anda.'
+    ]
+  };
+
+  const promoResult = {
+    type: 'Promo' as const,
+    title: 'Promo (Not Spam)',
+    accuracy: 'Tinggi (98%)',
+    analysisPoints: [
+      'Menggunakan bahasa sopan dan profesional serta mencantumkan nama penerima secara personal.',
+      'Menawarkan promo realistis dengan informasi yang jelas: jenis layanan, harga, kecepatan, dan masa berlaku promo.',
+      'Tautan yang diberikan terlihat aman (domain perusahaan resmi), tidak ada unsur penipuan atau desakan tidak wajar.'
+    ],
+    recommendations: [
+      'Jika Anda tertarik, Anda dapat menghubungi nomor resmi atau mengunjungi tautan yang disediakan untuk informasi lebih lanjut.',
+      'Pastikan koneksi aman saat mengakses situs atau memberikan data pribadi.'
+    ]
+  };
+
+  const fraudResult = {
+    type: 'Fraud' as const,
+    title: 'Fraud/SPAM/Hoax',
+    accuracy: 'Tinggi (98%)',
+    analysisPoints: [
+      'Pesan ini mengandung ciri-ciri umum spam seperti klaim "gaji fantastis", urgensi ("pelatihan online wajib besok"), penggunaan alamat email non-perusahaan (@gmail.com), dan instruksi untuk mengklik tautan eksternal.',
+      'Tidak ditemukan lowongan "Manajer Area" dari "PT. Makmur Jaya" di situs resmi perusahaan atau platform lowongan kerja terpercaya.',
+      'Ditemukan beberapa laporan penipuan yang terkait dengan nama perusahaan dan pola rekrutmen serupa.',
+      'Tautan bit.ly/lowongan-palsu-makmurjaya sangat mencurigakan, kemungkinan mengarah ke situs phishing atau pengunduhan malware.'
+    ],
+    recommendations: [
+      'JANGAN membalas pesan ini atau mengklik tautan yang diberikan.',
+      'JANGAN memberikan informasi pribadi atau finansial Anda.'
+    ]
   };
 
   return (
@@ -82,14 +216,55 @@ const LandingPage: React.FC = () => {
               rows={5}
               placeholder="Enter your message here..."
             ></textarea>
-            <button onClick={handleDetectSpam} disabled={isLoading} className="w-full mt-4 bg-slate-800 text-white py-3 rounded-lg font-semibold hover:bg-slate-700 disabled:bg-slate-400 transition-colors">
-              {isLoading ? 'Detecting...' : 'Detect Spam'}
+            <button 
+              onClick={handleDetectSpam} 
+              disabled={isLoading}
+              className="w-full mt-4 bg-slate-800 text-white py-3 rounded-lg font-semibold hover:bg-slate-700 disabled:bg-slate-400 transition-colors flex items-center justify-center"
+            >
+              {isLoading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Analyzing...
+                </>
+              ) : 'Detect'}
             </button>
-            {result && (
-              <div className={`mt-4 p-4 rounded-lg text-center font-medium ${result === 'Spam' ? 'bg-red-100 text-red-800' : result === 'NotSpam' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-                {result === 'Spam' && 'Result: This message is likely Spam.'}
-                {result === 'NotSpam' && 'Result: This message appears to be Not Spam.'}
-                {result === 'Error' && 'An error occurred. Please try again.'}
+            
+            {result && result !== 'Error' && (
+              <AnalysisResult
+                type={result}
+                title={
+                  result === 'Normal' ? normalResult.title :
+                  result === 'Promo' ? promoResult.title :
+                  fraudResult.title
+                }
+                accuracy={
+                  result === 'Normal' ? normalResult.accuracy :
+                  result === 'Promo' ? promoResult.accuracy :
+                  fraudResult.accuracy
+                }
+                analysisPoints={
+                  result === 'Normal' ? normalResult.analysisPoints :
+                  result === 'Promo' ? promoResult.analysisPoints :
+                  fraudResult.analysisPoints
+                }
+                recommendations={
+                  result === 'Normal' ? normalResult.recommendations :
+                  result === 'Promo' ? promoResult.recommendations :
+                  fraudResult.recommendations
+                }
+              />
+            )}
+
+            {result === 'Error' && (
+              <div className="mt-6 p-4 rounded-lg bg-yellow-50 border border-yellow-200 text-yellow-800">
+                <div className="flex items-center">
+                  <ExclamationCircleIcon className="h-5 w-5 mr-2" />
+                  <h3 className="font-medium">Analysis Error</h3>
+                </div>
+                <p className="mt-2">Could not analyze the message. Please try again with different content.</p>
               </div>
             )}
           </div>
