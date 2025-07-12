@@ -28,7 +28,6 @@ bot.on('message', async (msg) => {
       const { data: { text } } = await Tesseract.recognize(
         fileUrl,
         'ind', 
-        { logger: m => console.log(m) }
       );
       
       if (!text.trim()) throw new Error('Tidak ada teks terdeteksi');

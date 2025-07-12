@@ -48,7 +48,7 @@ const Header: React.FC = () => {
           <div className="hidden md:flex items-center space-x-8">
             <a href="#features" onClick={(e) => handleNavClick(e, '#features')} className="text-gray-600 hover:text-slate-800 font-medium">Features</a>
             <a href="#how-it-works" onClick={(e) => handleNavClick(e, '#how-it-works')} className="text-gray-600 hover:text-slate-800 font-medium">How It Works</a>
-            <a href="#contact" onClick={(e) => handleNavClick(e, '#contact')} className="text-gray-600 hover:text-slate-800 font-medium">Contact</a>
+            <a href="#contact" onClick={(e) => handleNavClick(e, '#contact')} className="text-gray-600 hover:text-slate-800 font-medium">Pricing</a>
           </div>
           <div className="flex items-center space-x-4">
             <button onClick={() => navigate('/login')} className="text-gray-600 hover:text-slate-800 font-medium">Login</button>
