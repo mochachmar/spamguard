@@ -8,7 +8,6 @@ const Header: React.FC = () => {
   const location = useLocation();
 
   const handleSmoothScroll = (hash: string) => {
-    // Timeout to ensure the element is available after a potential page navigation
     setTimeout(() => {
       const element = document.querySelector(hash);
       if (element) {

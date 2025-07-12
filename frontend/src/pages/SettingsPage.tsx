@@ -10,7 +10,6 @@ const SettingsPage: React.FC = () => {
         <p className="mt-1 text-gray-600">Manage your application and profile settings.</p>
       </div>
       
-      {/* Notifications Settings */}
       <div className="bg-white p-8 rounded-lg shadow-sm">
         <h2 className="text-xl font-bold text-gray-900 border-b pb-4">Notifications</h2>
         <div className="flex items-center justify-between pt-6">
@@ -29,7 +28,6 @@ const SettingsPage: React.FC = () => {
         </div>
       </div>
       
-      {/* Model Settings */}
       <div className="bg-white p-8 rounded-lg shadow-sm">
         <h2 className="text-xl font-bold text-gray-900 border-b pb-4">Model Settings</h2>
         <div className="flex items-center justify-between pt-6">
@@ -43,7 +41,6 @@ const SettingsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Admin Profile Settings */}
       <div className="bg-white p-8 rounded-lg shadow-sm">
         <h2 className="text-xl font-bold text-gray-900 border-b pb-4">Admin Profile</h2>
         <div className="pt-6">

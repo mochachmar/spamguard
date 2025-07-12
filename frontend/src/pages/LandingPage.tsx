@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { LightningBoltIcon, ShieldCheckIcon as ShieldIcon, UserGroupIcon, UploadIcon, CheckCircleIcon, ExclamationCircleIcon, XCircleIcon} from '../components/icons/InterfaceIcons';
+import React, { useState, useEffect, useRef } from 'react';
+import { LightningBoltIcon, ShieldCheckIcon as ShieldIcon, UserGroupIcon, CheckCircleIcon, UploadIcon, ExclamationCircleIcon, XCircleIcon } from '../components/icons/InterfaceIcons';
+import Tesseract from 'tesseract.js';
 
 const FeatureCard: React.FC<{ icon: React.ReactNode; title: string; description: string }> = ({ icon, title, description }) => (
   <div className="bg-white p-8 rounded-xl shadow-sm text-center items-center flex flex-col">
@@ -24,68 +25,77 @@ const StatItem: React.FC<{ value: string; label: string }> = ({ value, label }) 
   </div>
 );
 
-const AnalysisResult: React.FC<{ 
-  type: 'Normal' | 'Promo' | 'Fraud';
-  title: string;
-  accuracy: string;
-  analysisPoints: string[];
-  recommendations: string[];
-}> = ({ type, title, accuracy, analysisPoints, recommendations }) => {
-  // Determine styling based on result type
-  let bgColor, borderColor, textColor, icon;
-  switch (type) {
-    case 'Normal':
-      bgColor = 'bg-green-50';
-      borderColor = 'border-green-200';
-      textColor = 'text-green-800';
-      icon = <CheckCircleIcon className="h-5 w-5 text-green-500" />;
-      break;
-    case 'Promo':
-      bgColor = 'bg-blue-50';
-      borderColor = 'border-blue-200';
-      textColor = 'text-blue-800';
-      icon = <CheckCircleIcon className="h-5 w-5 text-blue-500" />;
-      break;
-    case 'Fraud':
-      bgColor = 'bg-red-50';
-      borderColor = 'border-red-200';
-      textColor = 'text-red-800';
-      icon = <XCircleIcon className="h-5 w-5 text-red-500" />;
-      break;
-    default:
-      bgColor = 'bg-gray-50';
-      borderColor = 'border-gray-200';
-      textColor = 'text-gray-800';
+interface AnalysisResultData {
+  status: 'Fraud/SPAM/Hoax' | 'PROMO (Bukan Spam)' | 'Normal (Bukan Spam)' | 'MENCURIGAKAN';
+  tingkat_akurasi: string;
+  analisis: string[];
+  rekomendasi: string[];
+}
+
+const cleanText = (text: string) => {
+  return text
+    .replace(/\s*\[\d+\]\s*/g, '')     
+    .replace(/\s*\(\d+\)\s*/g, '')     
+    .replace(/\d+(,\s*\d+)+/g, '')     
+    .replace(/\d+\.\s*/g, '')          
+    .replace(/\b\d+\s*-\s*\d+\b/g, '') 
+    .replace(/\s*\[\]\s*/g, '')        
+    .replace(/\s{2,}/g, ' ')           
+    .trim();
+};
+
+const AnalysisResult: React.FC<{ result: AnalysisResultData }> = ({ result }) => {
+  const cleanedAnalisis = result.analisis.map(cleanText);
+  const cleanedRekomendasi = result.rekomendasi.map(cleanText);
+  
+  let bgColor = 'bg-green-50';
+  let borderColor = 'border-green-500';
+  let titleColor = 'text-green-700';
+  let icon = <CheckCircleIcon className="h-5 w-5 text-green-500" />;
+  
+  if (result.status.includes('Fraud')) {
+    bgColor = 'bg-red-50';
+    borderColor = 'border-red-500';
+    titleColor = 'text-red-700';
+    icon = <XCircleIcon className="h-5 w-5 text-red-500" />;
+  }
+  if (result.status.includes('PROMO')) {
+    bgColor = 'bg-blue-50';
+    borderColor = 'border-blue-500';
+    titleColor = 'text-blue-700';
+    icon = <ShieldIcon className="h-5 w-5 text-blue-500" />;
+  }
+  if (result.status.includes('MENCURIGAKAN')) {
+    bgColor = 'bg-yellow-50';
+    borderColor = 'border-yellow-500';
+    titleColor = 'text-yellow-700';
+    icon = <ExclamationCircleIcon className="h-5 w-5 text-yellow-500" />;
   }
 
   return (
-    <div className={`mt-6 border rounded-lg p-6 ${bgColor} ${borderColor}`}>
-      <div className="flex justify-between items-center mb-4">
+    <div className={`mt-6 border-l-4 ${borderColor} ${bgColor} rounded-r-lg p-6 transition-all duration-300`}>
+      <div className="flex justify-between items-start mb-4">
         <div className="flex items-center gap-2">
           {icon}
-          <h3 className={`text-lg font-bold ${textColor}`}>{title}</h3>
+          <h3 className={`text-lg font-bold ${titleColor}`}>{result.status}</h3>
         </div>
-        <span className="text-xs px-2 py-1 rounded-full bg-white">
-          Accuracy: {accuracy}
+        <span className="bg-white px-3 py-1 rounded-full text-sm font-medium text-gray-700 border border-gray-200">
+          Akurasi: {result.tingkat_akurasi}
         </span>
       </div>
 
-      <h4 className="font-semibold text-gray-900 mb-2">AI Analysis</h4>
-      <ol className="list-decimal pl-5 space-y-2 mb-4">
-        {analysisPoints.map((point, index) => (
-          <li key={index} className="text-gray-700">{point}</li>
-        ))}
-      </ol>
+       <div className="mt-4">
+        <h4 className="font-semibold text-gray-900 mb-2">Analisis AI:</h4>
+         <ul className="list-disc list-inside text-gray-700 space-y-1">
+        {cleanedAnalisis.map((p, i) => <li key={i}>{p}</li>)}
+       </ul>
+      </div>
 
-      <hr className="my-4 border-gray-300" />
-
-      <div>
-        <h4 className="font-semibold text-gray-900 mb-2">Recommendation</h4>
-        <ol className="list-decimal pl-5 space-y-1">
-          {recommendations.map((rec, index) => (
-            <li key={index} className="text-gray-700">{rec}</li>
-          ))}
-        </ol>
+      <div className="mt-4">
+        <h4 className="font-semibold text-gray-900 mb-2">Rekomendasi:</h4>
+        <ul className="list-disc list-inside text-gray-700 space-y-1">
+        {cleanedRekomendasi.map((p, i) => <li key={i}>{p}</li>)}
+       </ul>
       </div>
     </div>
   );
@@ -94,92 +104,85 @@ const AnalysisResult: React.FC<{
 const LandingPage: React.FC = () => {
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState<'Spam' | 'NotSpam' | 'Error' | null>(null);
+  const [loadingStatus, setLoadingStatus] = useState('');
+  const [result, setResult] = useState<AnalysisResultData | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
-    // Trigger animation on component mount
     const timer = setTimeout(() => setIsLoaded(true), 100);
     return () => clearTimeout(timer);
   }, []);
 
-const handleDetectSpam = async () => {
-    if (!message.trim()) return;
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    processImageFile(file);
+  };
 
+  const processImageFile = async (file: File) => {
+    setIsLoading(true);
+    setLoadingStatus('Mengekstrak teks dari gambar...');
+    
+    try {
+      const { data: { text } } = await Tesseract.recognize(file, 'ind');
+      setMessage(text);
+      setLoadingStatus('Teks berhasil diekstrak!');
+    } catch (error) {
+      console.error("OCR Error:", error);
+      alert("Gagal membaca teks dari gambar.");
+    } finally {
+      setIsLoading(false);
+      setLoadingStatus('');
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    if (e.dataTransfer.files?.[0]) {
+      processImageFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleDetectSpam = async () => {
+    if (!message.trim()) return;
     setIsLoading(true);
     setResult(null);
 
-    // Simulate API call with timeout
-    setTimeout(() => {
-      // Determine result type based on message content (dummy logic)
-      let detectionResult: 'Normal' | 'Promo' | 'Fraud';
-      
-      if (message.includes('wawancara') || message.includes('interview')) {
-        detectionResult = 'Normal';
-      } else if (message.includes('promo') || message.includes('discount')) {
-        detectionResult = 'Promo';
-      } else if (message.includes('transfer') || message.includes('klik')) {
-        detectionResult = 'Fraud';
-      } else {
-        // Random result if no keywords match
-        const results: ('Normal' | 'Promo' | 'Fraud')[] = ['Normal', 'Promo', 'Fraud'];
-        detectionResult = results[Math.floor(Math.random() * results.length)];
-      }
+    try {
+      setLoadingStatus('Menganalisis dengan AI...');
+      const res = await fetch('http://localhost:5000/api/ai/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: message }),
+      });
 
-      setResult(detectionResult);
+      if (!res.ok) throw new Error('Gagal mendapatkan analisis dari server AI');
+      const analysisData = await res.json();
+      setResult(analysisData);
+    } catch (error) {
+      console.error('Detection Error:', error);
+      alert(error instanceof Error ? error.message : 'Terjadi kesalahan.');
+    } finally {
       setIsLoading(false);
-    }, 1500);
-  };
-
-  // Dummy data for different result types
-  const normalResult = {
-    type: 'Normal' as const,
-    title: 'Normal (Not Spam)',
-    accuracy: 'Tinggi (99%)',
-    analysisPoints: [
-      'Pesan ini menggunakan bahasa formal, menyebutkan posisi yang spesifik ("Staff Administrasi"), dan memberikan detali waktu serta lokasi wawancara.',
-      'Terdeteksi nama perusahaan "PT. Jaya Abadi" dan pengirim "HRD PT. Jaya Abadi".',
-      'Tidak ada indikator mencurigakan seperti permintaan transfer uang, klaim gaji tidak masuk akal, atau tautan yang mencurigakan.'
-    ],
-    recommendations: [
-      'Anda dapat membalas pesan ini untuk mengonfirmasi kehadiran wawancara Anda.'
-    ]
-  };
-
-  const promoResult = {
-    type: 'Promo' as const,
-    title: 'Promo (Not Spam)',
-    accuracy: 'Tinggi (98%)',
-    analysisPoints: [
-      'Menggunakan bahasa sopan dan profesional serta mencantumkan nama penerima secara personal.',
-      'Menawarkan promo realistis dengan informasi yang jelas: jenis layanan, harga, kecepatan, dan masa berlaku promo.',
-      'Tautan yang diberikan terlihat aman (domain perusahaan resmi), tidak ada unsur penipuan atau desakan tidak wajar.'
-    ],
-    recommendations: [
-      'Jika Anda tertarik, Anda dapat menghubungi nomor resmi atau mengunjungi tautan yang disediakan untuk informasi lebih lanjut.',
-      'Pastikan koneksi aman saat mengakses situs atau memberikan data pribadi.'
-    ]
-  };
-
-  const fraudResult = {
-    type: 'Fraud' as const,
-    title: 'Fraud/SPAM/Hoax',
-    accuracy: 'Tinggi (98%)',
-    analysisPoints: [
-      'Pesan ini mengandung ciri-ciri umum spam seperti klaim "gaji fantastis", urgensi ("pelatihan online wajib besok"), penggunaan alamat email non-perusahaan (@gmail.com), dan instruksi untuk mengklik tautan eksternal.',
-      'Tidak ditemukan lowongan "Manajer Area" dari "PT. Makmur Jaya" di situs resmi perusahaan atau platform lowongan kerja terpercaya.',
-      'Ditemukan beberapa laporan penipuan yang terkait dengan nama perusahaan dan pola rekrutmen serupa.',
-      'Tautan bit.ly/lowongan-palsu-makmurjaya sangat mencurigakan, kemungkinan mengarah ke situs phishing atau pengunduhan malware.'
-    ],
-    recommendations: [
-      'JANGAN membalas pesan ini atau mengklik tautan yang diberikan.',
-      'JANGAN memberikan informasi pribadi atau finansial Anda.'
-    ]
+      setLoadingStatus('');
+    }
   };
 
   return (
     <div className={`bg-white text-gray-800 transition-all duration-1000 ease-out ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}>
-      {/* Hero Section */}
       <section className="text-center py-20 sm:py-32">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex justify-center items-center gap-2 mb-4">
@@ -197,29 +200,51 @@ const handleDetectSpam = async () => {
           <p className="mt-6 text-lg text-gray-600 max-w-2xl mx-auto">Protect yourself from unwanted messages with our advanced spam detection. Simple, fast, and secure.</p>
         </div>
       </section>
-
-      {/* Test Your Message Section */}
+      
       <section className="pb-20 sm:pb-32">
         <div className="max-w-2xl mx-auto px-4">
-          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
-            <h2 className="text-2xl font-bold text-center mb-6 text-gray-900">Test Your Message</h2>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center mb-4">
-              <UploadIcon className="h-12 w-12 text-gray-400 mx-auto" />
-              <p className="mt-2 text-gray-600">
-                Drag and drop a file here, or <span className="font-medium text-slate-700 cursor-pointer">Browse files</span>
-              </p>
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 sm:p-8">
+            <h2 className="text-2xl font-bold text-center mb-6 text-gray-900">Periksa Pesan Anda</h2>
+            
+            <div 
+              className={`border-2 border-dashed rounded-lg p-8 text-center mb-6 cursor-pointer transition-all
+                ${isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'}`}
+              onClick={() => fileInputRef.current?.click()}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
+              <UploadIcon className="w-12 h-12 mx-auto text-gray-400 mb-3" />
+              <p className="font-medium text-gray-700 mb-1">Klik untuk mengunggah gambar</p>
+              <p className="text-gray-500 text-sm">atau drag and drop file di sini</p>
+              <p className="text-gray-400 text-xs mt-2">Format: JPG, PNG (maks. 5MB)</p>
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                onChange={handleFileUpload} 
+                className="hidden" 
+                accept="image/*" 
+              />
             </div>
-            <textarea
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              className="w-full p-4 bg-white border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-slate-500 focus:outline-none placeholder-gray-500"
-              rows={5}
-              placeholder="Enter your message here..."
-            ></textarea>
+            
+            <div className="mb-6">
+              <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                Atau tempel teks pesan disini:
+              </label>
+              <textarea 
+                id="message"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="Tempel teks pesan disini..."
+                className="w-full h-40 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              />
+            </div>
+            
             <button 
               onClick={handleDetectSpam} 
-              disabled={isLoading}
-              className="w-full mt-4 bg-slate-800 text-white py-3 rounded-lg font-semibold hover:bg-slate-700 disabled:bg-slate-400 transition-colors flex items-center justify-center"
+              disabled={isLoading || !message.trim()}
+              className={`w-full py-3 px-6 text-white font-medium rounded-lg transition-colors flex items-center justify-center
+                ${isLoading || !message.trim() ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
             >
               {isLoading ? (
                 <>
@@ -227,51 +252,23 @@ const handleDetectSpam = async () => {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Analyzing...
+                  {loadingStatus || 'Menganalisis...'}
                 </>
-              ) : 'Detect'}
+              ) : 'Deteksi Pesan'}
             </button>
             
-            {result && result !== 'Error' && (
-              <AnalysisResult
-                type={result}
-                title={
-                  result === 'Normal' ? normalResult.title :
-                  result === 'Promo' ? promoResult.title :
-                  fraudResult.title
-                }
-                accuracy={
-                  result === 'Normal' ? normalResult.accuracy :
-                  result === 'Promo' ? promoResult.accuracy :
-                  fraudResult.accuracy
-                }
-                analysisPoints={
-                  result === 'Normal' ? normalResult.analysisPoints :
-                  result === 'Promo' ? promoResult.analysisPoints :
-                  fraudResult.analysisPoints
-                }
-                recommendations={
-                  result === 'Normal' ? normalResult.recommendations :
-                  result === 'Promo' ? promoResult.recommendations :
-                  fraudResult.recommendations
-                }
-              />
-            )}
-
-            {result === 'Error' && (
-              <div className="mt-6 p-4 rounded-lg bg-yellow-50 border border-yellow-200 text-yellow-800">
-                <div className="flex items-center">
-                  <ExclamationCircleIcon className="h-5 w-5 mr-2" />
-                  <h3 className="font-medium">Analysis Error</h3>
-                </div>
-                <p className="mt-2">Could not analyze the message. Please try again with different content.</p>
+            {isLoading && !loadingStatus.includes('OCR') && (
+              <div className="mt-6 text-center">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+                <p className="mt-2 text-gray-600">Menganalisis pesan...</p>
               </div>
             )}
+            
+            {result && <AnalysisResult result={result} />}
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
       <section id="features" className="bg-gray-50 py-20 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
@@ -286,7 +283,6 @@ const handleDetectSpam = async () => {
         </div>
       </section>
 
-      {/* How It Works Section */}
       <section id="how-it-works" className="py-20 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
@@ -301,7 +297,6 @@ const handleDetectSpam = async () => {
         </div>
       </section>
 
-      {/* Stats Section */}
       <section className="bg-gray-50 py-20 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
