@@ -74,10 +74,10 @@ async function analyzeMessage(chatId, userInput) {
 
 function getStatusEmoji(status) {
   const emojis = {
-    'Fraud/SPAM/Hoax': '🔴',
-    'PROMO (Bukan Spam)': '🟢',
-    'Normal (Bukan Spam)': '🟢',
-    'MENCURIGAKAN': '🟡'
+    'Fraud/SPAM/Hoax': '😱',
+    'PROMO (Bukan Spam)': '🤩',
+    'Normal (Bukan Spam)': '😉',
+    'MENCURIGAKAN': '🧐'
   };
-  return emojis[status] || '⚪';
+  return emojis[status] || '😐';
 }
