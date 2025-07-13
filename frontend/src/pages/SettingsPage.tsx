@@ -44,13 +44,13 @@ const SettingsPage: React.FC = () => {
       <div className="bg-white p-8 rounded-lg shadow-sm">
         <h2 className="text-xl font-bold text-gray-900 border-b pb-4">Admin Profile</h2>
         <div className="pt-6">
-            <div className="flex items-center space-x-6 mb-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-8">
                 <img className="h-24 w-24 rounded-full" src="https://i.pravatar.cc/150?u=ethan" alt="Profile" />
-                <div>
+                <div className="flex-grow">
                     <p className="text-lg font-bold text-gray-800">Ethan Carter</p>
                     <p className="text-sm text-gray-500">ethan.carter@example.com</p>
                 </div>
-                <button className="px-4 py-2 bg-gray-100 text-gray-800 font-medium rounded-md hover:bg-gray-200 transition-colors border border-gray-300 ml-auto">
+                <button className="px-4 py-2 bg-gray-100 text-gray-800 font-medium rounded-md hover:bg-gray-200">
                     Change Photo
                 </button>
             </div>

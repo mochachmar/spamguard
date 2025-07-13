@@ -1,43 +1,73 @@
-
 import React, { useState } from 'react';
 import { Message } from '../../types';
 import { SearchIcon, ChevronDownIcon } from '../components/icons/InterfaceIcons';
 
 const mockMessages: Message[] = [
-    { id: 'MSG001', sender: 'Jack', category: 'Spam', date: '2024-01-15', status: 'Detected', fromEmail: 'jack.s@example.com', content: 'Hello, I hope this message finds you well. I am writing to you regarding our upcoming meeting scheduled for next week. Please find attached the agenda for your review. Let me know if you have any questions or need further clarification. Best regards, Alice' },
-    { id: 'MSG002', sender: 'Sinder', category: 'Suspicious', date: '2024-01-16', status: 'Not Detected', fromEmail: 'sinder@corp.com', content: 'This is a legitimate business proposal.' },
-    { id: 'MSG003', sender: 'Jackleon', category: 'Spam', date: '2024-01-17', status: 'Detected', fromEmail: 'jackleon.scam@phish.net', content: 'URGENT: Your account has been compromised! Click here to verify.' },
-    { id: 'MSG004', sender: 'Sindefire', category: 'Suspicious', date: '2024-01-18', status: 'Not Detected', fromEmail: 'sindefire@workplace.io', content: 'Reminder: Team meeting at 3 PM today.' },
-    { id: 'MSG005', sender: 'Juventus', category: 'Spam', date: '2024-01-19', status: 'Detected', fromEmail: 'juventus.lotto@winner.org', content: 'Congratulations! You have won a lottery.' },
-    { id: 'MSG006', sender: 'Airref', category: 'Suspicious', date: '2024-01-20', status: 'Not Detected', fromEmail: 'support@airref.com', content: 'Your support ticket has been updated.' },
-    { id: 'MSG007', sender: 'Popol', category: 'Spam', date: '2024-01-21', status: 'Detected', fromEmail: 'popol.deals@shopnow.biz', content: 'Exclusive deals just for you! 90% OFF!' },
-    { id: 'MSG008', sender: 'Kupa', category: 'Suspicious', date: '2024-01-22', status: 'Not Detected', fromEmail: 'kupa.news@newsletter.com', content: 'Your weekly newsletter is here.' },
-    { id: 'MSG009', sender: 'Roger', category: 'Spam', date: '2024-01-23', status: 'Detected', fromEmail: 'roger.ph@malwarelink.co', content: 'Download this file for important information.' },
-    { id: 'MSG010', sender: 'Wonder', category: 'Suspicious', date: '2024-01-24', status: 'Not Detected', fromEmail: 'noreply@wonder.app', content: 'Your password has been successfully reset.' },
-    { id: 'MSG011', sender: 'Another User', category: 'Suspicious', date: '2024-01-25', status: 'Not Detected', fromEmail: 'user@example.com', content: 'Following up on our conversation.' },
-    { id: 'MSG012', sender: 'Spammy McSpamface', category: 'Spam', date: '2024-01-26', status: 'Detected', fromEmail: 'buy.now@spam.com', content: 'You are pre-approved for a loan!' },
-    { id: 'MSG013', sender: 'Prince Najim', category: 'Spam', date: '2024-01-27', status: 'Detected', fromEmail: 'prince.najim@royal-wealth.net', content: 'Greetings, I have a business proposition worth millions for you.' },
-    { id: 'MSG014', sender: 'ShipFast', category: 'Suspicious', date: '2024-01-28', status: 'Not Detected', fromEmail: 'tracking@shipfast.com', content: 'Your package with tracking number SF123456 has been dispatched.' },
-    { id: 'MSG015', sender: 'Jane Doe', category: 'Suspicious', date: '2024-01-29', status: 'Not Detected', fromEmail: 'jane.doe@personal.com', content: 'Hey, are you free for a call sometime this week?' },
-    { id: 'MSG016', sender: 'IT Support', category: 'Spam', date: '2024-01-30', status: 'Detected', fromEmail: 'support@your-service-update.com', content: 'Action Required: Your mailbox is almost full. Upgrade now to avoid service disruption.' },
-    { id: 'MSG017', sender: 'QuickMeds', category: 'Spam', date: '2024-01-31', status: 'Detected', fromEmail: 'deals@quickmeds-rx.info', content: 'Unbelievable discounts on all your favorite medication. Order now!' },
-    { id: 'MSG018', sender: 'The Coffee Club', category: 'Suspicious', date: '2024-02-01', status: 'Not Detected', fromEmail: 'newsletter@thecoffeeclub.com', content: 'February Brews: Discover our new single-origin roasts.' },
-    { id: 'MSG019', sender: 'SocialConnect', category: 'Suspicious', date: '2024-02-02', status: 'Not Detected', fromEmail: 'notification@socialconnect.com', content: 'You have a new friend request from John Smith.' },
-    { id: 'MSG020', sender: 'Secure Bank', category: 'Spam', date: '2024-02-03', status: 'Detected', fromEmail: 'alert@secure-bank-inc.com', content: 'We have detected a suspicious login attempt on your account. Please login here to verify your identity.' },
-    { id: 'MSG021', sender: 'Project Team', category: 'Suspicious', date: '2024-02-04', status: 'Not Detected', fromEmail: 'project-updates@work.com', content: 'The project timeline has been updated. Please see the attached document.' },
-    { id: 'MSG022', sender: 'Online Casino', category: 'Spam', date: '2024-02-05', status: 'Detected', fromEmail: 'winner@online-casino-paradise.net', content: 'Claim your 200 free spins today! No deposit required.' },
-    { id: 'MSG023', sender: 'HR Department', category: 'Suspicious', date: '2024-02-06', status: 'Not Detected', fromEmail: 'hr@yourcompany.com', content: 'Reminder: Please submit your timesheets for the previous month.' },
-    { id: 'MSG024', sender: 'Cloud Storage', category: 'Spam', date: '2024-02-07', status: 'Detected', fromEmail: 'action@cloud-storage-team.com', content: 'Your cloud storage is full. Your files will be deleted in 24 hours unless you upgrade.' },
-    { id: 'MSG025', sender: 'Local Gym', category: 'Suspicious', date: '2024-02-08', status: 'Not Detected', fromEmail: 'info@localgym.com', content: 'New Year, New You! Check out our new class schedule.' },
-    { id: 'MSG026', sender: 'IRS', category: 'Spam', date: '2024-02-09', status: 'Detected', fromEmail: 'notice@irs-tax-collection.org', content: 'Final Warning: There is a warrant for your arrest due to unpaid taxes. Contact us immediately.' },
-    { id: 'MSG027', sender: 'Travel Deals', category: 'Spam', date: '2024-02-10', status: 'Detected', fromEmail: 'fly@cheap-air-tickets.biz', content: 'Error fare to Hawaii! Book now for only $99.' }
+    { 
+      id: 'MSG001', 
+      category: 'Fraud', 
+      fraudType: 'Phishing', 
+      date: '2024-01-15', 
+      content: 'Hello, I hope this message finds you well...' 
+    },
+    { 
+      id: 'MSG002', 
+      category: 'Mencurigakan', 
+      fraudType: 'Malware', 
+      date: '2024-01-16', 
+      content: 'This is a legitimate business proposal.' 
+    },
+    { 
+      id: 'MSG003', 
+      category: 'SPAM', 
+      fraudType: 'Scams', 
+      date: '2024-01-17', 
+      content: 'URGENT: Your account has been compromised!' 
+    },
+    { 
+      id: 'MSG004', 
+      category: 'Hoax', 
+      fraudType: 'Other', 
+      date: '2024-01-18', 
+      content: 'Reminder: Team meeting at 3 PM today.' 
+    },
+    { 
+      id: 'MSG005', 
+      category: 'Fraud', 
+      fraudType: 'Phishing', 
+      date: '2024-01-19', 
+      content: 'Congratulations! You have won a lottery.' 
+    }
 ];
 
-const StatusBadge: React.FC<{ status: Message['status'] | Message['category'] }> = ({ status }) => {
-    const isSpamOrDetected = status === 'Spam' || status === 'Detected';
+// Mapping for Category colors
+const categoryColors: { [key: string]: string } = {
+    'Fraud': 'bg-red-100 text-red-800',
+    'SPAM': 'bg-purple-100 text-purple-800',
+    'Mencurigakan': 'bg-yellow-100 text-yellow-800',
+    'Hoax': 'bg-blue-100 text-blue-800',
+};
+
+// Mapping for FraudType colors
+const fraudTypeColors: { [key: string]: string } = {
+    'Phishing': 'bg-red-100 text-red-800',
+    'Malware': 'bg-orange-100 text-orange-800',
+    'Scams': 'bg-purple-100 text-purple-800',
+    'Other': 'bg-gray-100 text-gray-800',
+};
+
+// Category Badge Component
+const CategoryBadge: React.FC<{ category: Message['category'] }> = ({ category }) => {
+    const badgeStyle = categoryColors[category] || 'bg-gray-100 text-gray-800';
     const baseClasses = "px-3 py-1 text-xs font-semibold rounded-full leading-tight";
-    const styles = isSpamOrDetected ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800';
-    return <span className={`${baseClasses} ${styles}`}>{status}</span>;
+    return <span className={`${baseClasses} ${badgeStyle}`}>{category}</span>;
+}
+
+// FraudType Badge Component
+const FraudTypeBadge: React.FC<{ fraudType: Message['fraudType'] }> = ({ fraudType }) => {
+    const badgeStyle = fraudTypeColors[fraudType] || 'bg-gray-100 text-gray-800';
+    const baseClasses = "px-3 py-1 text-xs font-semibold rounded-full leading-tight";
+    return <span className={`${baseClasses} ${badgeStyle}`}>{fraudType}</span>;
 }
 
 const MessageDetails: React.FC<{ message: Message | null }> = ({ message }) => {
@@ -53,10 +83,9 @@ const MessageDetails: React.FC<{ message: Message | null }> = ({ message }) => {
         <div className="bg-white p-6 rounded-lg shadow-sm sticky top-8">
             <h3 className="text-xl font-bold text-gray-900 mb-4">Message Details</h3>
             <div className="space-y-3 text-sm">
-                <p className="text-gray-900"><span className="font-semibold text-gray-900">From:</span> {message.fromEmail}</p>
                 <p className="text-gray-900"><span className="font-semibold text-gray-900">Date:</span> {message.date}</p>
-                <p className="text-gray-900"><span className="font-semibold text-gray-900">Category:</span> {message.category}</p>
-                <p className="text-gray-900"><span className="font-semibold text-gray-900">Status:</span> {message.status}</p>
+                <p className="text-gray-900"><span className="font-semibold text-gray-900">Category:</span> <CategoryBadge category={message.category} /></p>
+                <p className="text-gray-900"><span className="font-semibold text-gray-900">Fraud Type:</span> <FraudTypeBadge fraudType={message.fraudType} /></p>
             </div>
             <div className="mt-6">
                 <h4 className="font-semibold text-gray-800 mb-2">Message Content</h4>
@@ -73,7 +102,6 @@ const MessageDetails: React.FC<{ message: Message | null }> = ({ message }) => {
     );
 };
 
-
 const MessagesPage: React.FC = () => {
     const [selectedMessage, setSelectedMessage] = useState<Message | null>(mockMessages[0]);
 
@@ -83,8 +111,8 @@ const MessagesPage: React.FC = () => {
                 <h1 className="text-3xl font-bold text-gray-900">Messages</h1>
                 <p className="mt-1 text-gray-600">View all messages received and processed by the system.</p>
             </div>
-            <div className="flex gap-8">
-                <div className="w-full lg:w-2/3">
+            <div className="flex flex-col lg:flex-row gap-6">
+                <div className="w-full lg:w-1/2 xl:w-2/3">
                     <div className="bg-white rounded-lg shadow-sm flex flex-col">
                         <div className="p-4 flex flex-col sm:flex-row justify-between items-center gap-4 border-b border-gray-200">
                             <div className="relative w-full sm:w-auto flex-grow max-w-xs">
@@ -97,11 +125,11 @@ const MessagesPage: React.FC = () => {
                                 <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">Date <ChevronDownIcon className="h-4 w-4" /></button>
                             </div>
                         </div>
-                        <div className="overflow-auto max-h-[calc(100vh-24rem)]">
-                            <table className="min-w-full divide-y divide-gray-200">
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full">
                                 <thead className="bg-gray-50 sticky top-0">
                                     <tr>
-                                        {['Message ID', 'Sender', 'Category', 'Date of Receipt', 'Status', 'Action'].map(header => (
+                                        {['Message ID', 'Category', 'Fraud Type', 'Date of Receipt', 'Action'].map(header => (
                                             <th key={header} scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{header}</th>
                                         ))}
                                     </tr>
@@ -110,10 +138,9 @@ const MessagesPage: React.FC = () => {
                                     {mockMessages.map((message) => (
                                         <tr key={message.id} className={`${selectedMessage?.id === message.id ? 'bg-indigo-50' : ''} hover:bg-gray-50`}>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{message.id}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{message.sender}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap"><StatusBadge status={message.category} /></td>
+                                            <td className="px-6 py-4 whitespace-nowrap"><CategoryBadge category={message.category} /></td>
+                                            <td className="px-6 py-4 whitespace-nowrap"><FraudTypeBadge fraudType={message.fraudType} /></td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{message.date}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap"><StatusBadge status={message.status} /></td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                 <button onClick={() => setSelectedMessage(message)} className="text-indigo-600 hover:text-indigo-900">View</button>
                                             </td>
@@ -124,8 +151,8 @@ const MessagesPage: React.FC = () => {
                         </div>
                     </div>
                 </div>
-                <div className="hidden lg:block w-1/3">
-                     <MessageDetails message={selectedMessage} />
+                <div className={`w-full lg:w-1/2 xl:w-1/3 ${selectedMessage ? 'block' : 'hidden lg:block'}`}>
+                    <MessageDetails message={selectedMessage} />
                 </div>
             </div>
         </div>

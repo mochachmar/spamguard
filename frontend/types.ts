@@ -1,4 +1,3 @@
-
 export interface Notification {
   id: number;
   type: 'Warning' | 'Info' | 'Alert';
@@ -8,13 +7,10 @@ export interface Notification {
 
 export interface Message {
   id: string;
-  sender: string;
-  category: 'Spam' | 'Suspicious';
-  fraudType?: 'Phishing' | 'Malware' | 'Scams' | 'Other' | 'N/A';
+  category: 'Fraud' | 'SPAM' | 'Hoax' | 'Mencurigakan';
+  fraudType: 'Phishing' | 'Malware' | 'Scams' | 'Other' | 'N/A';
   date: string;
-  status: 'Detected' | 'Not Detected';
   content: string;
-  fromEmail: string;
 }
 
 export interface NotificationItem {

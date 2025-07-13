@@ -1,15 +1,21 @@
-
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { ShieldCheckIcon, HomeIcon, MessageIcon, FeedbackIcon, SettingsIcon, LogoutIcon } from '../icons/InterfaceIcons';
 
 interface SidebarProps {
   onLogout: () => void;
+  onNavigate?: () => void; // Add this new prop
 }
 
-const NavItem: React.FC<{ to: string; icon: React.ReactNode; label: string }> = ({ to, icon, label }) => (
+const NavItem: React.FC<{ 
+  to: string; 
+  icon: React.ReactNode; 
+  label: string;
+  onClick?: () => void;
+}> = ({ to, icon, label, onClick }) => (
   <NavLink
     to={to}
+    onClick={onClick}
     className={({ isActive }) =>
       `flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-colors ${
         isActive
@@ -23,12 +29,17 @@ const NavItem: React.FC<{ to: string; icon: React.ReactNode; label: string }> = 
   </NavLink>
 );
 
-const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
+const Sidebar: React.FC<SidebarProps> = ({ onLogout, onNavigate }) => {
   const navigate = useNavigate();
 
   const handleLogoutClick = () => {
     onLogout();
     navigate('/login');
+    onNavigate?.(); // Close sidebar on logout too
+  };
+
+  const handleNavClick = () => {
+    onNavigate?.(); // Close sidebar when any nav item is clicked
   };
 
   return (
@@ -39,10 +50,30 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
       </div>
       <div className="flex-grow p-4">
         <nav className="space-y-2">
-          <NavItem to="/dashboard" icon={<HomeIcon className="h-5 w-5" />} label="Dashboard" />
-          <NavItem to="/messages" icon={<MessageIcon className="h-5 w-5" />} label="Messages" />
-          <NavItem to="/feedback" icon={<FeedbackIcon className="h-5 w-5" />} label="Feedback" />
-          <NavItem to="/settings" icon={<SettingsIcon className="h-5 w-5" />} label="Settings" />
+          <NavItem 
+            to="/dashboard" 
+            icon={<HomeIcon className="h-5 w-5" />} 
+            label="Dashboard" 
+            onClick={handleNavClick}
+          />
+          <NavItem 
+            to="/messages" 
+            icon={<MessageIcon className="h-5 w-5" />} 
+            label="Messages" 
+            onClick={handleNavClick}
+          />
+          <NavItem 
+            to="/feedback" 
+            icon={<FeedbackIcon className="h-5 w-5" />} 
+            label="Feedback" 
+            onClick={handleNavClick}
+          />
+          <NavItem 
+            to="/settings" 
+            icon={<SettingsIcon className="h-5 w-5" />} 
+            label="Settings" 
+            onClick={handleNavClick}
+          />
         </nav>
       </div>
       <div className="p-4 border-t border-gray-200">
