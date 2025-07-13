@@ -8,7 +8,7 @@ export interface Notification {
 export interface Message {
   id: string;
   category: 'Fraud' | 'SPAM' | 'Hoax' | 'Mencurigakan';
-  fraudType: 'Phishing' | 'Malware' | 'Scams' | 'Other' | 'N/A';
+  fraudType: 'Phishing' | 'Malware' | 'Scams' | 'Other';
   date: string;
   content: string;
 }
