@@ -109,6 +109,8 @@ const LandingPage: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoaded(true), 100);
@@ -118,6 +120,7 @@ const LandingPage: React.FC = () => {
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
+    setSelectedImage(file); // Simpan file gambar
     processImageFile(file);
   };
 
@@ -152,7 +155,9 @@ const LandingPage: React.FC = () => {
     setIsDragging(false);
     
     if (e.dataTransfer.files?.[0]) {
-      processImageFile(e.dataTransfer.files[0]);
+      const file = e.dataTransfer.files[0];
+      setSelectedImage(file); // Simpan file gambar
+      processImageFile(file);
     }
   };
 
@@ -160,13 +165,35 @@ const LandingPage: React.FC = () => {
     if (!message.trim()) return;
     setIsLoading(true);
     setResult(null);
+    let uploadedImageUrl = null;
 
     try {
       setLoadingStatus('Menganalisis dengan AI...');
+
+      // Upload gambar jika ada
+      if (selectedImage) {
+        setLoadingStatus('Mengunggah gambar...');
+        const formData = new FormData();
+        formData.append('image', selectedImage);
+        
+        const uploadRes = await fetch('http://localhost:5000/api/upload', {
+          method: 'POST',
+          body: formData
+        });
+        
+        if (!uploadRes.ok) throw new Error('Gagal mengunggah gambar');
+        const { fileName } = await uploadRes.json();
+        uploadedImageUrl = fileName;
+      }
+
+      setLoadingStatus('Menganalisis pesan...');
       const res = await fetch('http://localhost:5000/api/ai/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: message }),
+        body: JSON.stringify({ 
+          prompt: message,
+          imageUrl: uploadedImageUrl // Kirim nama file gambar
+        }),
       });
 
       if (!res.ok) throw new Error('Gagal mendapatkan analisis dari server AI');
@@ -178,6 +205,7 @@ const LandingPage: React.FC = () => {
     } finally {
       setIsLoading(false);
       setLoadingStatus('');
+      setSelectedImage(null); // Reset gambar setelah selesai
     }
   };
 

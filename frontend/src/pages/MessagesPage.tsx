@@ -32,7 +32,8 @@ const FraudTypeBadge: React.FC<{ fraudType: Message['fraudType'] }> = ({ fraudTy
     return <span className={`${baseClasses} ${badgeStyle}`}>{fraudType}</span>;
 }
 
-const MessageDetails: React.FC<{ message: Message | null }> = ({ message }) => {
+const MessageDetails: React.FC<{ message: Message | null 
+  onDelete: (id: string) => void }> = ({ message, onDelete }) => {
     if (!message) {
         return (
             <div className="bg-white p-6 rounded-lg shadow-sm h-full flex items-center justify-center">
@@ -66,7 +67,12 @@ const MessageDetails: React.FC<{ message: Message | null }> = ({ message }) => {
 </div>
             <div className="flex justify-end space-x-3 mt-8">
                 <button className="px-4 py-2 bg-slate-700 text-white text-sm font-medium rounded-md hover:bg-slate-600">Edit</button>
-                <button className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-500">Delete</button>
+                <button 
+                    onClick={() => message && onDelete(message.id)} 
+                    className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-500"
+                    >
+                    Delete
+                </button>
             </div>
         </div>
     );
@@ -76,19 +82,43 @@ const MessagesPage: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
 
-  useEffect(() => {
-  const fetchMessages = async () => {
+  const handleDelete = async (id: string) => {
     try {
-      const response = await fetch('http://localhost:5000/api/messages');
-      const data: Message[] = await response.json();
-      setMessages(data);
-      if (data.length > 0) setSelectedMessage(data[0]);
+      const response = await fetch(`http://localhost:5000/api/messages/${id}`, {
+        method: 'DELETE'
+      });
+      
+      if (!response.ok) throw new Error('Gagal menghapus pesan');
+      
+      // Perbarui state setelah penghapusan
+      setMessages(messages.filter(msg => msg.id !== id));
+      
+      // Reset selectedMessage jika yang dipilih dihapus
+      if (selectedMessage && selectedMessage.id === id) {
+        setSelectedMessage(messages.length > 1 ? messages[0] : null);
+      }
+      
+      alert('Pesan berhasil dihapus');
     } catch (error) {
-      console.error('Error fetching messages:', error);
+      console.error('Delete error:', error);
+      alert('Gagal menghapus pesan');
     }
   };
-  fetchMessages();
-}, []);
+
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/messages');
+        const data: Message[] = await response.json();
+        setMessages(data);
+        if (data.length > 0) setSelectedMessage(data[0]);
+      } catch (error) {
+        console.error('Error fetching messages:', error);
+      }
+    };
+
+    fetchMessages();
+  }, []);
 
     return (
         <div className="space-y-8">
@@ -137,7 +167,10 @@ const MessagesPage: React.FC = () => {
                     </div>
                 </div>
                 <div className={`w-full lg:w-1/2 xl:w-1/3 ${selectedMessage ? 'block' : 'hidden lg:block'}`}>
-                    <MessageDetails message={selectedMessage} />
+                    <MessageDetails 
+                        message={selectedMessage} 
+                        onDelete={handleDelete} 
+                        />
                 </div>
             </div>
         </div>

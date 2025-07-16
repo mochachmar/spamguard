@@ -1,4 +1,6 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { createMessage } = require('./messageControllers');
+
 require('dotenv').config();
 
 const genAI = new GoogleGenerativeAI(process.env.API_KEY);
@@ -91,7 +93,7 @@ const generateFullAnalysis = async (userInput) => {
 };
 
 const generateContentForAPI = async (req, res) => {
-  const { prompt } = req.body;
+  const { prompt, imageUrl } = req.body;
   if (!prompt) {
     return res.status(400).json({ message: 'Prompt dibutuhkan' });
   }
@@ -99,6 +101,33 @@ const generateContentForAPI = async (req, res) => {
   if (generatedData.error) {
     return res.status(500).json({ message: generatedData.error });
   }
+
+  // Simpan jika termasuk kategori spam
+  const spamCategories = ['Fraud/SPAM/Hoax', 'MENCURIGAKAN'];
+  if (spamCategories.includes(generatedData.status)) {
+    const source = 'web';
+    
+    // Tentukan kategori spesifik
+    let specificCategory = 'SPAM';
+    if (generatedData.analisis.some(a => a.includes('phishing'))) specificCategory = 'Fraud';
+    if (generatedData.analisis.some(a => a.includes('hoax'))) specificCategory = 'Hoax';
+    if (generatedData.status === 'MENCURIGAKAN') specificCategory = 'Mencurigakan';
+
+    // Tentukan fraud type
+    let fraudType = 'Other';
+    if (generatedData.analisis.some(a => a.includes('phishing'))) fraudType = 'Phishing';
+    if (generatedData.analisis.some(a => a.includes('malware'))) fraudType = 'Malware';
+    if (generatedData.analisis.some(a => a.includes('scam'))) fraudType = 'Scams';
+
+    await createMessage({
+      content: prompt,
+      category: specificCategory,
+      fraudType,
+      imageUrl,
+      source
+    });
+  }
+
   res.status(200).json(generatedData);
 };
 

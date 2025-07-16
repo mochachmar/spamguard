@@ -1,6 +1,8 @@
 const TelegramBot = require('node-telegram-bot-api');
 const { generateFullAnalysis } = require('./controllers/aiController'); 
 const Tesseract = require('tesseract.js'); 
+const { createMessage } = require('./controllers/messageControllers');
+
 require('dotenv').config();
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -31,7 +33,13 @@ bot.on('message', async (msg) => {
       );
       
       if (!text.trim()) throw new Error('Tidak ada teks terdeteksi');
-      return analyzeMessage(chatId, text);
+
+      // Simpan gambar
+      const filename = `TG-${Date.now()}.jpg`;
+      const imagePath = path.join(__dirname, 'uploads', 'images', filename);
+      fs.writeFileSync(imagePath, imageBuffer);
+      
+      return analyzeMessage(chatId, text, filename);
     } catch (error) {
       console.error('OCR Error:', error);
       return bot.sendMessage(chatId, '❌ Gagal membaca teks di gambar. Pastikan gambar jelas dan mengandung teks.');
@@ -45,7 +53,7 @@ bot.on('message', async (msg) => {
   bot.sendMessage(chatId, '⚠️ Kirim pesan teks atau gambar untuk dianalisis');
 });
 
-async function analyzeMessage(chatId, userInput) {
+async function analyzeMessage(chatId, userInput, imageFilename = null) {
   try {
     bot.sendMessage(chatId, '🤖 Sedang menganalisis...');
     
@@ -66,6 +74,28 @@ async function analyzeMessage(chatId, userInput) {
     
     bot.sendMessage(chatId, response, { parse_mode: 'Markdown' });
     
+    // Simpan jika termasuk spam
+    const spamCategories = ['Fraud/SPAM/Hoax', 'MENCURIGAKAN'];
+    if (spamCategories.includes(analysis.status)) {
+      let specificCategory = 'SPAM';
+      if (analysis.analisis.some(a => a.includes('phishing'))) specificCategory = 'Fraud';
+      if (analysis.analisis.some(a => a.includes('hoax'))) specificCategory = 'Hoax';
+      if (analysis.status === 'MENCURIGAKAN') specificCategory = 'Mencurigakan';
+
+      let fraudType = 'Other';
+      if (analysis.analisis.some(a => a.includes('phishing'))) fraudType = 'Phishing';
+      if (analysis.analisis.some(a => a.includes('malware'))) fraudType = 'Malware';
+      if (analysis.analisis.some(a => a.includes('scam'))) fraudType = 'Scams';
+
+      await createMessage({
+        content: userInput,
+        category: specificCategory,
+        fraudType,
+        imageUrl: imageFilename,
+        source: 'telegram'
+      });
+    }
+
   } catch (error) {
     console.error('Analysis Error:', error);
     bot.sendMessage(chatId, '⚠️ Gagal menganalisis pesan. Silakan coba lagi.');

@@ -11,7 +11,7 @@ export interface Message {
   fraudType: 'Phishing' | 'Malware' | 'Scams' | 'Other';
   date: string;
   content: string;
-  imageUrl?: string; // Tambahkan ini
+  imageUrl?: string; 
 }
 
 export interface NotificationItem {
