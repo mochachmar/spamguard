@@ -175,10 +175,12 @@ const LandingPage: React.FC = () => {
         const formData = new FormData();
         formData.append('image', selectedImage);
         
-        const uploadRes = await fetch('http://localhost:5000/api/upload', {
+        const uploadRes = await fetch('http://localhost:5000/api/uploads/upload', {
           method: 'POST',
           body: formData
         });
+
+        if (!uploadRes.ok) throw new Error('Gagal mengunggah gambar');
         
         const { fileName } = await uploadRes.json();
         uploadedImageUrl = fileName;
