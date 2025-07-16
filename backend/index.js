@@ -2,6 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require('./config/db');
+const path = require('path');
 
 dotenv.config();
 
@@ -19,6 +20,8 @@ app.get('/', (req, res) => {
 });
 app.use('/api/example', require('./routes/aiRoutes'));
 app.use('/api/ai', require('./routes/aiRoutes'));
+app.use('/api/messages', require('./routes/messageRoutes'));
+app.use('/messages', express.static(path.join(__dirname, 'uploads', 'images')));
 
 const PORT = process.env.PORT || 5000;
 

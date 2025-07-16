@@ -1,44 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Message } from '../../types';
 import { SearchIcon, ChevronDownIcon } from '../components/icons/InterfaceIcons';
-
-const mockMessages: Message[] = [
-    { 
-      id: 'MSG001', 
-      category: 'Fraud', 
-      fraudType: 'Phishing', 
-      date: '2024-01-15', 
-      content: 'Hello, I hope this message finds you well...' 
-    },
-    { 
-      id: 'MSG002', 
-      category: 'Mencurigakan', 
-      fraudType: 'Malware', 
-      date: '2024-01-16', 
-      content: 'This is a legitimate business proposal.' 
-    },
-    { 
-      id: 'MSG003', 
-      category: 'SPAM', 
-      fraudType: 'Scams', 
-      date: '2024-01-17', 
-      content: 'URGENT: Your account has been compromised!' 
-    },
-    { 
-      id: 'MSG004', 
-      category: 'Hoax', 
-      fraudType: 'Other', 
-      date: '2024-01-18', 
-      content: 'Reminder: Team meeting at 3 PM today.' 
-    },
-    { 
-      id: 'MSG005', 
-      category: 'Fraud', 
-      fraudType: 'Phishing', 
-      date: '2024-01-19', 
-      content: 'Congratulations! You have won a lottery.' 
-    }
-];
 
 // Mapping for Category colors
 const categoryColors: { [key: string]: string } = {
@@ -92,8 +54,16 @@ const MessageDetails: React.FC<{ message: Message | null }> = ({ message }) => {
                 <p className="text-sm text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-md border">{message.content}</p>
             </div>
             <div className="mt-6 bg-gray-50 p-4 rounded-md border flex items-center justify-center">
-                 <img src="https://picsum.photos/seed/document/300/400" alt="Document preview" className="rounded-md shadow-md"/>
-            </div>
+  {message.imageUrl ? (
+    <img 
+  src={`http://localhost:5000/messages/${message.imageUrl}`}
+  alt="Document preview" 
+  className="rounded-md shadow-md max-w-full h-auto"
+/>
+  ) : (
+    <p className="text-gray-500">No image available</p>
+  )}
+</div>
             <div className="flex justify-end space-x-3 mt-8">
                 <button className="px-4 py-2 bg-slate-700 text-white text-sm font-medium rounded-md hover:bg-slate-600">Edit</button>
                 <button className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-500">Delete</button>
@@ -103,7 +73,22 @@ const MessageDetails: React.FC<{ message: Message | null }> = ({ message }) => {
 };
 
 const MessagesPage: React.FC = () => {
-    const [selectedMessage, setSelectedMessage] = useState<Message | null>(mockMessages[0]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
+
+  useEffect(() => {
+  const fetchMessages = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/messages');
+      const data: Message[] = await response.json();
+      setMessages(data);
+      if (data.length > 0) setSelectedMessage(data[0]);
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+    }
+  };
+  fetchMessages();
+}, []);
 
     return (
         <div className="space-y-8">
@@ -135,7 +120,7 @@ const MessagesPage: React.FC = () => {
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
-                                    {mockMessages.map((message) => (
+                                    {messages.map((message) => (
                                         <tr key={message.id} className={`${selectedMessage?.id === message.id ? 'bg-indigo-50' : ''} hover:bg-gray-50`}>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{message.id}</td>
                                             <td className="px-6 py-4 whitespace-nowrap"><CategoryBadge category={message.category} /></td>
