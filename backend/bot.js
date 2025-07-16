@@ -2,13 +2,37 @@ const TelegramBot = require('node-telegram-bot-api');
 const { generateFullAnalysis } = require('./controllers/aiController'); 
 const Tesseract = require('tesseract.js'); 
 const { createMessage } = require('./controllers/messageControllers');
-
+const https = require('https');
+const fs = require('fs');
+const path = require('path');
 require('dotenv').config();
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
 const bot = new TelegramBot(token, { polling: true });
 
 console.log('🤖 Bot Telegram siap menerima pesan');
+
+// Fungsi untuk mengunduh gambar
+const downloadImage = (url, dest) => {
+  return new Promise((resolve, reject) => {
+    const file = fs.createWriteStream(dest);
+    https.get(url, (response) => {
+      response.pipe(file);
+      file.on('finish', () => {
+        file.close(resolve);
+      });
+    }).on('error', (err) => {
+      fs.unlink(dest, () => {}); // Hapus file jika error
+      reject(err);
+    });
+  });
+};
+
+// Pastikan folder uploads/images ada
+const uploadDir = path.join(__dirname, 'uploads', 'images');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
 bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
@@ -23,22 +47,23 @@ bot.on('message', async (msg) => {
   if (msg.photo) {
     try {
       const fileId = msg.photo[msg.photo.length - 1].file_id;
-      const fileUrl = await bot.getFileLink(fileId);
-      
+      const file = await bot.getFile(fileId);
+      const fileUrl = `https://api.telegram.org/file/bot${token}/${file.file_path}`;
+
       bot.sendMessage(chatId, '🖼️ Menganalisis gambar...');
+
+      // Unduh gambar
+      const filename = `TG-${Date.now()}.jpg`;
+      const destPath = path.join(uploadDir, filename);
+      await downloadImage(fileUrl, destPath);
       
+      // Proses OCR
       const { data: { text } } = await Tesseract.recognize(
-        fileUrl,
+        destPath,
         'ind', 
       );
       
       if (!text.trim()) throw new Error('Tidak ada teks terdeteksi');
-
-      // Simpan gambar
-      const filename = `TG-${Date.now()}.jpg`;
-      const imagePath = path.join(__dirname, 'uploads', 'images', filename);
-      fs.writeFileSync(imagePath, imageBuffer);
-      
       return analyzeMessage(chatId, text, filename);
     } catch (error) {
       console.error('OCR Error:', error);
