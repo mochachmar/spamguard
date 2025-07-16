@@ -110,7 +110,6 @@ const LandingPage: React.FC = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoaded(true), 100);
@@ -181,7 +180,6 @@ const LandingPage: React.FC = () => {
           body: formData
         });
         
-        if (!uploadRes.ok) throw new Error('Gagal mengunggah gambar');
         const { fileName } = await uploadRes.json();
         uploadedImageUrl = fileName;
       }
