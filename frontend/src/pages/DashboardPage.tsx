@@ -1,24 +1,15 @@
-
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, BarChart, Bar, CartesianGrid } from 'recharts';
 import { ArrowUpIcon, ArrowDownIcon } from '../components/icons/InterfaceIcons';
 import { Notification } from '../../types';
 
-const kpiData = [
-  { title: 'Total Messages Processed', value: '12,345', change: '+10%', changeType: 'increase' as const },
-  { title: 'Spam Messages Detected', value: '2,567', change: '-5%', changeType: 'decrease' as const },
-  { title: 'Model Accuracy', value: '98.5%', change: '+0.2%', changeType: 'increase' as const },
-];
-
-const spamTrendData = [
-  { name: 'Jan', value: 2400 }, { name: 'Feb', value: 1398 }, { name: 'Mar', value: 3800 },
-  { name: 'Apr', value: 2908 }, { name: 'May', value: 4800 }, { name: 'Jun', value: 3800 },
-];
-
-const spamCategoryData = [
-  { name: 'Phishing', value: 400 }, { name: 'Malware', value: 300 },
-  { name: 'Scams', value: 200 }, { name: 'Other', value: 278 },
-];
+interface DashboardStats {
+  totalProcessed: number;
+  spamDetected: number;
+  modelAccuracy: number;
+  spamTrend: { _id: string; count: number }[];
+  fraudDistribution: { _id: string; count: number }[];
+}
 
 const notificationsData: Notification[] = [
   { id: 1, date: '2024-07-15', type: 'Warning', description: 'Unusual activity detected from IP address 192.168.1.100' },
@@ -51,6 +42,76 @@ const NotificationBadge: React.FC<{ type: Notification['type'] }> = ({ type }) =
 }
 
 const DashboardPage: React.FC = () => {
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/dashboard/stats');
+        const data = await response.json();
+        setStats(data);
+      } catch (error) {
+        console.error('Error fetching dashboard stats:', error);
+      }
+    };
+    
+    fetchStats();
+    const interval = setInterval(fetchStats, 30000); // Refresh setiap 30 detik
+    
+    return () => clearInterval(interval);
+  }, []);
+
+  // Format data untuk chart
+  const spamTrendData = stats?.spamTrend.map(item => ({
+    name: new Date(item._id).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }),
+    value: item.count
+  })) || [];
+
+  const spamCategoryData = stats?.fraudDistribution.map(item => ({
+    name: item._id,
+    value: item.count
+  })) || [];
+
+  // Hitung perubahan 30 hari
+  const calculateChange = () => {
+    if (!stats?.spamTrend || stats.spamTrend.length < 2) return 0;
+    
+    const currentPeriod = stats.spamTrend.slice(-7).reduce((sum, day) => sum + day.count, 0);
+    const previousPeriod = stats.spamTrend.slice(-14, -7).reduce((sum, day) => sum + day.count, 0);
+    
+    if (previousPeriod === 0) return 0;
+    return ((currentPeriod - previousPeriod) / previousPeriod) * 100;
+  };
+
+  const change = calculateChange();
+  const changeType: "increase" | "decrease" = change >= 0 ? "increase" : "decrease";
+
+  const kpiData: {
+    title: string;
+    value: string;
+    change: string;
+    changeType: "increase" | "decrease";
+  }[] = [
+    { 
+      title: 'Total Messages Processed', 
+      value: stats?.totalProcessed.toLocaleString() || '0', 
+      change: change.toFixed(1) + '%', 
+      changeType
+    },
+    { 
+      title: 'Spam Messages Detected', 
+      value: stats?.spamDetected.toLocaleString() || '0', 
+      change: change.toFixed(1) + '%', 
+      changeType
+    },
+    { 
+      title: 'Model Accuracy', 
+      value: stats ? `${stats.modelAccuracy.toFixed(1)}%` : '0%', 
+      change: '+0.5%', 
+      changeType: "increase"
+    },
+  ];
+
   return (
     <div className="space-y-8">
       <div>
@@ -69,8 +130,12 @@ const DashboardPage: React.FC = () => {
         <div className="grid grid-cols-1 gap-6">
           <div className="bg-white p-6 rounded-lg shadow-sm">
             <h3 className="text-lg font-semibold text-gray-800">Spam Detection Rate Over Time</h3>
-            <p className="text-3xl font-bold text-gray-900">15%</p>
-            <p className="text-sm text-green-600">Last 30 Days +2%</p>
+            <p className="text-3xl font-bold text-gray-900">
+              {stats?.spamTrend ? stats.spamTrend.reduce((sum, day) => sum + day.count, 0) : 0}
+            </p>
+            <p className={`text-sm ${changeType === 'increase' ? 'text-green-600' : 'text-red-600'}`}>
+              Last 30 Days {change >= 0 ? '+' : ''}{change.toFixed(1)}%
+            </p>
             <div className="h-60 mt-4">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={spamTrendData} margin={{ top: 5, right: 20, left: -20, bottom: 5 }}>
@@ -82,17 +147,15 @@ const DashboardPage: React.FC = () => {
             </div>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-800">Spam Categories</h3>
-            <p className="text-3xl font-bold text-gray-900">20%</p>
-            <p className="text-sm text-red-600">Last 30 Days -3%</p>
+            <h3 className="text-lg font-semibold text-gray-800">Percentage Value Fraud Type</h3>
             <div className="h-60 mt-4">
-               <ResponsiveContainer width="100%" height="100%">
-                 <BarChart data={spamCategoryData} margin={{ top: 5, right: 20, left: -20, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                    <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{fill: '#6b7280'}} />
-                    <YAxis axisLine={false} tickLine={false} tick={false} />
-                    <Tooltip cursor={{fill: 'rgba(239, 246, 255, 0.5)'}} />
-                    <Bar dataKey="value" fill="#a5b4fc" radius={[4, 4, 0, 0]} />
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={spamCategoryData} margin={{ top: 5, right: 20, left: -20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{fill: '#6b7280'}} />
+                  <YAxis axisLine={false} tickLine={false} />
+                  <Tooltip cursor={{fill: 'rgba(239, 246, 255, 0.5)'}} />
+                  <Bar dataKey="value" fill="#a5b4fc" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>

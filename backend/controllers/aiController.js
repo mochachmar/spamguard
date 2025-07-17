@@ -1,5 +1,6 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { createMessage } = require('./messageControllers');
+const AnalysisLog = require('../models/AnalysisLogModel');
 
 require('dotenv').config();
 
@@ -125,6 +126,13 @@ const generateContentForAPI = async (req, res) => {
       fraudType,
       imageUrl,
       source
+    });
+
+    // Simpan log analisis
+    await AnalysisLog.create({
+      isSpam: spamCategories.includes(generatedData.status),
+      accuracy: parseFloat(generatedData.tingkat_akurasi),
+      source: 'web'
     });
   }
 
