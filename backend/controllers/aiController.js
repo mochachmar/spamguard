@@ -33,11 +33,13 @@ const generateFullAnalysis = async (userInput) => {
       3. JANGAN GUNAKAN KURUNG SIKU KOSONG [] DI MANA PUN
       4. Gunakan bahasa natural seperti manusia bicara
       5. Jangan sertakan referensi pencarian
+      6. Untuk kategori Fraud, tentukan jenis penipuan (Phishing, Malware, Scams) dalam analisis
+      7. Untuk kategori Hoax, sebutkan kata "hoax" dalam analisis
       
       ### STRUKTUR JSON:
       {
         "status": "Fraud/SPAM/Hoax|PROMO (Bukan Spam)|Normal (Bukan Spam)|MENCURIGAKAN",
-        "tingkat_akurasi": "string",
+        "tingkat_akurasi": "string (contoh: Tinggi (98%))",
         "analisis": ["poin analisis 1", "poin analisis 2"],
         "rekomendasi": ["saran 1", "saran 2"]
       }
@@ -47,8 +49,8 @@ const generateFullAnalysis = async (userInput) => {
         "status": "Fraud/SPAM/Hoax",
         "tingkat_akurasi": "Tinggi (98%)",
         "analisis": [
-          "Penawaran gaji tidak realistis tanpa proses seleksi",
-          "Email menggunakan domain publik untuk perusahaan"
+          "Pesan mengandung tautan phishing yang mencoba mencuri informasi login",
+          "Menggunakan teknik social engineering untuk menakut-nakuti korban"
         ],
         "rekomendasi": [
           "Jangan klik tautan mencurigakan",
@@ -103,6 +105,13 @@ const generateContentForAPI = async (req, res) => {
     return res.status(500).json({ message: generatedData.error });
   }
 
+  // Ekstrak nilai numerik dari tingkat akurasi
+  let accuracyValue = 0;
+  const accuracyMatch = generatedData.tingkat_akurasi.match(/\d+(\.\d+)?/);
+  if (accuracyMatch) {
+    accuracyValue = parseFloat(accuracyMatch[0]);
+  }
+
   // Simpan jika termasuk kategori spam
   const spamCategories = ['Fraud/SPAM/Hoax', 'MENCURIGAKAN'];
   if (spamCategories.includes(generatedData.status)) {
@@ -110,15 +119,15 @@ const generateContentForAPI = async (req, res) => {
     
     // Tentukan kategori spesifik
     let specificCategory = 'SPAM';
-    if (generatedData.analisis.some(a => a.includes('phishing'))) specificCategory = 'Fraud';
-    if (generatedData.analisis.some(a => a.includes('hoax'))) specificCategory = 'Hoax';
+    if (generatedData.analisis.some(a => a.toLowerCase().includes('phishing'))) specificCategory = 'Fraud';
+    if (generatedData.analisis.some(a => a.toLowerCase().includes('hoax'))) specificCategory = 'Hoax';
     if (generatedData.status === 'MENCURIGAKAN') specificCategory = 'Mencurigakan';
 
     // Tentukan fraud type
     let fraudType = 'Other';
-    if (generatedData.analisis.some(a => a.includes('phishing'))) fraudType = 'Phishing';
-    if (generatedData.analisis.some(a => a.includes('malware'))) fraudType = 'Malware';
-    if (generatedData.analisis.some(a => a.includes('scam'))) fraudType = 'Scams';
+    if (generatedData.analisis.some(a => a.toLowerCase().includes('phishing'))) fraudType = 'Phishing';
+    if (generatedData.analisis.some(a => a.toLowerCase().includes('malware'))) fraudType = 'Malware';
+    if (generatedData.analisis.some(a => a.toLowerCase().includes('scam'))) fraudType = 'Scams';
 
     await createMessage({
       content: prompt,
@@ -131,7 +140,7 @@ const generateContentForAPI = async (req, res) => {
     // Simpan log analisis
     await AnalysisLog.create({
       isSpam: spamCategories.includes(generatedData.status),
-      accuracy: parseFloat(generatedData.tingkat_akurasi),
+      accuracy: accuracyValue,
       source: 'web'
     });
   }

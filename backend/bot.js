@@ -5,6 +5,8 @@ const { createMessage } = require('./controllers/messageControllers');
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
+const AnalysisLog = require('./models/AnalysisLogModel');
+
 require('dotenv').config();
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -83,6 +85,13 @@ async function analyzeMessage(chatId, userInput, imageFilename = null) {
     bot.sendMessage(chatId, '🤖 Sedang menganalisis...');
     
     const analysis = await generateFullAnalysis(userInput);
+
+    // Ekstrak nilai numerik dari tingkat akurasi
+    let accuracyValue = 0;
+    const accuracyMatch = analysis.tingkat_akurasi.match(/\d+(\.\d+)?/);
+    if (accuracyMatch) {
+      accuracyValue = parseFloat(accuracyMatch[0]);
+    }
     
     let response = `*Status Deteksi:* ${getStatusEmoji(analysis.status)} ${analysis.status}\n`;
     response += `*Tingkat Akurasi:* ${analysis.tingkat_akurasi}\n\n`;
@@ -103,20 +112,27 @@ async function analyzeMessage(chatId, userInput, imageFilename = null) {
     const spamCategories = ['Fraud/SPAM/Hoax', 'MENCURIGAKAN'];
     if (spamCategories.includes(analysis.status)) {
       let specificCategory = 'SPAM';
-      if (analysis.analisis.some(a => a.includes('phishing'))) specificCategory = 'Fraud';
-      if (analysis.analisis.some(a => a.includes('hoax'))) specificCategory = 'Hoax';
+      if (analysis.analisis.some(a => a.toLowerCase().includes('phishing'))) specificCategory = 'Fraud';
+      if (analysis.analisis.some(a => a.toLowerCase().includes('hoax'))) specificCategory = 'Hoax';
       if (analysis.status === 'MENCURIGAKAN') specificCategory = 'Mencurigakan';
 
       let fraudType = 'Other';
-      if (analysis.analisis.some(a => a.includes('phishing'))) fraudType = 'Phishing';
-      if (analysis.analisis.some(a => a.includes('malware'))) fraudType = 'Malware';
-      if (analysis.analisis.some(a => a.includes('scam'))) fraudType = 'Scams';
+      if (analysis.analisis.some(a => a.toLowerCase().includes('phishing'))) fraudType = 'Phishing';
+      if (analysis.analisis.some(a => a.toLowerCase().includes('malware'))) fraudType = 'Malware';
+      if (analysis.analisis.some(a => a.toLowerCase().includes('scam'))) fraudType = 'Scams';
 
       await createMessage({
         content: userInput,
         category: specificCategory,
         fraudType,
         imageUrl: imageFilename,
+        source: 'telegram'
+      });
+
+      // Simpan log analisis
+      await AnalysisLog.create({
+        isSpam: true,
+        accuracy: accuracyValue,
         source: 'telegram'
       });
     }

@@ -9,6 +9,7 @@ interface DashboardStats {
   modelAccuracy: number;
   spamTrend: { _id: string; count: number }[];
   fraudDistribution: { _id: string; count: number }[];
+  totalChange: number; // Added property
 }
 
 const notificationsData: Notification[] = [
@@ -72,37 +73,23 @@ const DashboardPage: React.FC = () => {
     value: item.count
   })) || [];
 
-  // Hitung perubahan 30 hari
-  const calculateChange = () => {
-    if (!stats?.spamTrend || stats.spamTrend.length < 2) return 0;
-    
-    const currentPeriod = stats.spamTrend.slice(-7).reduce((sum, day) => sum + day.count, 0);
-    const previousPeriod = stats.spamTrend.slice(-14, -7).reduce((sum, day) => sum + day.count, 0);
-    
-    if (previousPeriod === 0) return 0;
-    return ((currentPeriod - previousPeriod) / previousPeriod) * 100;
-  };
+  // Hitung perubahan spam 30 hari
+  const spamChange = stats?.spamTrend && stats.spamTrend.length > 0 
+    ? ((stats.spamTrend[stats.spamTrend.length - 1].count - stats.spamTrend[0].count) / stats.spamTrend[0].count) * 100
+    : 0;
 
-  const change = calculateChange();
-  const changeType: "increase" | "decrease" = change >= 0 ? "increase" : "decrease";
-
-  const kpiData: {
-    title: string;
-    value: string;
-    change: string;
-    changeType: "increase" | "decrease";
-  }[] = [
+  const kpiData: { title: string; value: string; change: string; changeType: "increase" | "decrease" }[] = [
     { 
       title: 'Total Messages Processed', 
       value: stats?.totalProcessed.toLocaleString() || '0', 
-      change: change.toFixed(1) + '%', 
-      changeType
+      change: stats ? `${stats.totalChange.toFixed(1)}%` : '0%', 
+      changeType: stats?.totalChange && stats.totalChange >= 0 ? "increase" : "decrease"
     },
     { 
       title: 'Spam Messages Detected', 
       value: stats?.spamDetected.toLocaleString() || '0', 
-      change: change.toFixed(1) + '%', 
-      changeType
+      change: stats ? `${spamChange.toFixed(1)}%` : '0%', 
+      changeType: spamChange >= 0 ? "increase" : "decrease"
     },
     { 
       title: 'Model Accuracy', 
@@ -133,8 +120,8 @@ const DashboardPage: React.FC = () => {
             <p className="text-3xl font-bold text-gray-900">
               {stats?.spamTrend ? stats.spamTrend.reduce((sum, day) => sum + day.count, 0) : 0}
             </p>
-            <p className={`text-sm ${changeType === 'increase' ? 'text-green-600' : 'text-red-600'}`}>
-              Last 30 Days {change >= 0 ? '+' : ''}{change.toFixed(1)}%
+            <p className={`text-sm ${spamChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              Last 30 Days {spamChange >= 0 ? '+' : ''}{spamChange.toFixed(1)}%
             </p>
             <div className="h-60 mt-4">
               <ResponsiveContainer width="100%" height="100%">
@@ -148,6 +135,7 @@ const DashboardPage: React.FC = () => {
           </div>
           <div className="bg-white p-6 rounded-lg shadow-sm">
             <h3 className="text-lg font-semibold text-gray-800">Percentage Value Fraud Type</h3>
+            <p className="text-3xl font-bold text-gray-900">30 Days</p>
             <div className="h-60 mt-4">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={spamCategoryData} margin={{ top: 5, right: 20, left: -20, bottom: 5 }}>
