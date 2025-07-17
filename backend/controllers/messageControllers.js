@@ -5,7 +5,7 @@ const getMessages = async (req, res) => {
     const messages = await Message.find();
     
     const formattedMessages = messages.map(msg => ({
-      id: msg.id, // Gunakan id kustom
+      id: msg.id, 
       category: msg.category,
       fraudType: msg.fraudType,
       date: msg.detectionDate.toISOString().split('T')[0],
@@ -21,10 +21,19 @@ const getMessages = async (req, res) => {
 
 const createMessage = async (messageData) => {
   try {
-    // Generate ID unik
+    const validCategories = ['Fraud', 'SPAM', 'Hoax', 'Mencurigakan'];
+    if (!validCategories.includes(messageData.category)) {
+      messageData.category = 'Mencurigakan';
+    }
+
+    const validFraudTypes = ['Phishing', 'Malware', 'Scams', 'Other'];
+    if (!validFraudTypes.includes(messageData.fraudType)) {
+      messageData.fraudType = 'Other';
+    }
+
     const prefix = messageData.source === 'telegram' ? 'TG' : 'WEB';
     const count = await Message.countDocuments({ source: messageData.source });
-    const id = `${prefix}${(count + 1).toString().padStart(3, '0')}`;
+    const id = `${prefix}${(count + 1).toString().padStart(4, '0')}`;
 
     const newMessage = new Message({
       id,
@@ -38,7 +47,7 @@ const createMessage = async (messageData) => {
     await newMessage.save();
     return newMessage;
   } catch (err) {
-    console.error('Save spam error:', err.message);
+    console.error('Error menyimpan pesan:', err.message);
     throw err;
   }
 };

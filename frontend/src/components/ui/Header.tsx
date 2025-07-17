@@ -4,7 +4,7 @@ import { ShieldCheckIcon} from '../icons/InterfaceIcons';
 import MenuIcon from '../icons/MenuIcon'; 
 
 interface HeaderProps {
-  onNavClick?: () => void; // Add this prop
+  onNavClick?: () => void; 
 }
 
 const Header: React.FC<HeaderProps> = ({ onNavClick }) => {
@@ -30,7 +30,7 @@ const Header: React.FC<HeaderProps> = ({ onNavClick }) => {
       navigate('/');
     }
     handleSmoothScroll(hash);
-    onNavClick?.(); // Close sidebar when nav item is clicked
+    onNavClick?.(); 
   };
 
   const handleLogoClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -40,7 +40,7 @@ const Header: React.FC<HeaderProps> = ({ onNavClick }) => {
     } else {
       navigate('/');
     }
-    onNavClick?.(); // Close sidebar when logo is clicked
+    onNavClick?.(); 
   };
 
   return (

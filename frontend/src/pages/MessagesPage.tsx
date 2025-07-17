@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Message } from '../../types';
 import { SearchIcon, ChevronDownIcon } from '../components/icons/InterfaceIcons';
 
-// Mapping for Category colors
 const categoryColors: { [key: string]: string } = {
     'Fraud': 'bg-red-100 text-red-800',
     'SPAM': 'bg-purple-100 text-purple-800',
@@ -10,7 +9,6 @@ const categoryColors: { [key: string]: string } = {
     'Hoax': 'bg-blue-100 text-blue-800',
 };
 
-// Mapping for FraudType colors
 const fraudTypeColors: { [key: string]: string } = {
     'Phishing': 'bg-red-100 text-red-800',
     'Malware': 'bg-orange-100 text-orange-800',
@@ -18,14 +16,12 @@ const fraudTypeColors: { [key: string]: string } = {
     'Other': 'bg-gray-100 text-gray-800',
 };
 
-// Category Badge Component
 const CategoryBadge: React.FC<{ category: Message['category'] }> = ({ category }) => {
     const badgeStyle = categoryColors[category] || 'bg-gray-100 text-gray-800';
     const baseClasses = "px-3 py-1 text-xs font-semibold rounded-full leading-tight";
     return <span className={`${baseClasses} ${badgeStyle}`}>{category}</span>;
 }
 
-// FraudType Badge Component
 const FraudTypeBadge: React.FC<{ fraudType: Message['fraudType'] }> = ({ fraudType }) => {
     const badgeStyle = fraudTypeColors[fraudType] || 'bg-gray-100 text-gray-800';
     const baseClasses = "px-3 py-1 text-xs font-semibold rounded-full leading-tight";
@@ -90,10 +86,8 @@ const MessagesPage: React.FC = () => {
       
       if (!response.ok) throw new Error('Gagal menghapus pesan');
       
-      // Perbarui state setelah penghapusan
       setMessages(messages.filter(msg => msg.id !== id));
       
-      // Reset selectedMessage jika yang dipilih dihapus
       if (selectedMessage && selectedMessage.id === id) {
         setSelectedMessage(messages.length > 1 ? messages[0] : null);
       }

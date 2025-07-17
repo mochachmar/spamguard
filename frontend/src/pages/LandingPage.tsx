@@ -30,6 +30,7 @@ interface AnalysisResultData {
   tingkat_akurasi: string;
   analisis: string[];
   rekomendasi: string[];
+  fraudType?: string; 
 }
 
 const cleanText = (text: string) => {
@@ -45,6 +46,7 @@ const cleanText = (text: string) => {
 };
 
 const AnalysisResult: React.FC<{ result: AnalysisResultData }> = ({ result }) => {
+  const isSpam = ['Fraud', 'SPAM', 'Hoax', 'Mencurigakan'].includes(result.status);
   const cleanedAnalisis = result.analisis.map(cleanText);
   const cleanedRekomendasi = result.rekomendasi.map(cleanText);
   
@@ -53,6 +55,18 @@ const AnalysisResult: React.FC<{ result: AnalysisResultData }> = ({ result }) =>
   let titleColor = 'text-green-700';
   let icon = <CheckCircleIcon className="h-5 w-5 text-green-500" />;
   
+  if (result.status.includes('Hoax')) {
+    bgColor = 'bg-red-50';
+    borderColor = 'border-red-500';
+    titleColor = 'text-red-700';
+    icon = <XCircleIcon className="h-5 w-5 text-red-500" />;
+  }
+  if (result.status.includes('SPAM')) {
+    bgColor = 'bg-red-50';
+    borderColor = 'border-red-500';
+    titleColor = 'text-red-700';
+    icon = <XCircleIcon className="h-5 w-5 text-red-500" />;
+  }
   if (result.status.includes('Fraud')) {
     bgColor = 'bg-red-50';
     borderColor = 'border-red-500';
@@ -77,7 +91,14 @@ const AnalysisResult: React.FC<{ result: AnalysisResultData }> = ({ result }) =>
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-center gap-2">
           {icon}
-          <h3 className={`text-lg font-bold ${titleColor}`}>{result.status}</h3>
+          <div>
+            <h3 className={`text-lg font-bold ${titleColor}`}>{result.status}</h3>
+            {isSpam && (
+              <p className="text-sm text-gray-700 mt-1">
+                Kategori: {result.status} | Jenis: {result.fraudType}
+              </p>
+            )}
+          </div>
         </div>
         <span className="bg-white px-3 py-1 rounded-full text-sm font-medium text-gray-700 border border-gray-200">
           Akurasi: {result.tingkat_akurasi}
@@ -119,7 +140,7 @@ const LandingPage: React.FC = () => {
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    setSelectedImage(file); // Simpan file gambar
+    setSelectedImage(file); 
     processImageFile(file);
   };
 
@@ -155,7 +176,7 @@ const LandingPage: React.FC = () => {
     
     if (e.dataTransfer.files?.[0]) {
       const file = e.dataTransfer.files[0];
-      setSelectedImage(file); // Simpan file gambar
+      setSelectedImage(file); 
       processImageFile(file);
     }
   };
@@ -169,7 +190,6 @@ const LandingPage: React.FC = () => {
     try {
       setLoadingStatus('Menganalisis dengan AI...');
 
-      // Upload gambar jika ada
       if (selectedImage) {
         setLoadingStatus('Mengunggah gambar...');
         const formData = new FormData();
@@ -192,7 +212,7 @@ const LandingPage: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           prompt: message,
-          imageUrl: uploadedImageUrl // Kirim nama file gambar
+          imageUrl: uploadedImageUrl 
         }),
       });
 
@@ -205,7 +225,7 @@ const LandingPage: React.FC = () => {
     } finally {
       setIsLoading(false);
       setLoadingStatus('');
-      setSelectedImage(null); // Reset gambar setelah selesai
+      setSelectedImage(null); 
     }
   };
 

@@ -14,7 +14,6 @@ const bot = new TelegramBot(token, { polling: true });
 
 console.log('🤖 Bot Telegram siap menerima pesan');
 
-// Fungsi untuk mengunduh gambar
 const downloadImage = (url, dest) => {
   return new Promise((resolve, reject) => {
     const file = fs.createWriteStream(dest);
@@ -24,13 +23,12 @@ const downloadImage = (url, dest) => {
         file.close(resolve);
       });
     }).on('error', (err) => {
-      fs.unlink(dest, () => {}); // Hapus file jika error
+      fs.unlink(dest, () => {}); 
       reject(err);
     });
   });
 };
 
-// Pastikan folder uploads/images ada
 const uploadDir = path.join(__dirname, 'uploads', 'images');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
@@ -54,12 +52,10 @@ bot.on('message', async (msg) => {
 
       bot.sendMessage(chatId, '🖼️ Menganalisis gambar...');
 
-      // Unduh gambar
       const filename = `TG-${Date.now()}.jpg`;
       const destPath = path.join(uploadDir, filename);
       await downloadImage(fileUrl, destPath);
       
-      // Proses OCR
       const { data: { text } } = await Tesseract.recognize(
         destPath,
         'ind', 
@@ -86,7 +82,6 @@ async function analyzeMessage(chatId, userInput, imageFilename = null) {
     
     const analysis = await generateFullAnalysis(userInput);
 
-    // Ekstrak nilai numerik dari tingkat akurasi
     let accuracyValue = 0;
     const accuracyMatch = analysis.tingkat_akurasi.match(/\d+(\.\d+)?/);
     if (accuracyMatch) {
@@ -107,39 +102,36 @@ async function analyzeMessage(chatId, userInput, imageFilename = null) {
     });
     
     bot.sendMessage(chatId, response, { parse_mode: 'Markdown' });
-    
-    // Simpan jika termasuk spam
-    const spamCategories = ['Fraud/SPAM/Hoax', 'MENCURIGAKAN'];
+
+    await AnalysisLog.create({
+      isSpam: ['Fraud', 'SPAM', 'Hoax', 'Mencurigakan'].includes(analysis.status),
+      accuracy: accuracyValue,
+      source: 'telegram'
+    });
+
+    const spamCategories = ['Fraud', 'SPAM', 'Hoax', 'Mencurigakan'];
     if (spamCategories.includes(analysis.status)) {
-      let specificCategory = 'SPAM';
-      if (analysis.analisis.some(a => a.toLowerCase().includes('phishing'))) specificCategory = 'Fraud';
-      if (analysis.analisis.some(a => a.toLowerCase().includes('hoax'))) specificCategory = 'Hoax';
-      if (analysis.status === 'MENCURIGAKAN') specificCategory = 'Mencurigakan';
-
-      let fraudType = 'Other';
-      if (analysis.analisis.some(a => a.toLowerCase().includes('phishing'))) fraudType = 'Phishing';
-      if (analysis.analisis.some(a => a.toLowerCase().includes('malware'))) fraudType = 'Malware';
-      if (analysis.analisis.some(a => a.toLowerCase().includes('scam'))) fraudType = 'Scams';
-
       await createMessage({
         content: userInput,
-        category: specificCategory,
-        fraudType,
+        category: analysis.status,
+        fraudType: analysis.fraudType || 'Other',
         imageUrl: imageFilename,
-        source: 'telegram'
-      });
-
-      // Simpan log analisis
-      await AnalysisLog.create({
-        isSpam: true,
-        accuracy: accuracyValue,
         source: 'telegram'
       });
     }
 
   } catch (error) {
     console.error('Analysis Error:', error);
-    bot.sendMessage(chatId, '⚠️ Gagal menganalisis pesan. Silakan coba lagi.');
+    
+    await createMessage({
+      content: userInput,
+      category: 'Mencurigakan',
+      fraudType: 'Other',
+      imageUrl: imageFilename,
+      source: 'telegram'
+    });
+    
+    bot.sendMessage(chatId, '⚠️ Gagal menganalisis pesan. Pesan telah dicatat sebagai mencurigakan.');
   }
 }
 

@@ -25,44 +25,60 @@ const generateFullAnalysis = async (userInput) => {
     });
 
     const prompt = `
-      Anda adalah detektif siber profesional. Tugas Anda adalah menganalisis pesan dan mengembalikan hasil HANYA dalam format JSON valid.
-      
-      ### PERATURAN KETAT OUTPUT:
-      1. JANGAN GUNAKAN ANGKA/NOMOR APAPUN dalam analisis atau rekomendasi
-      2. HINDARI: [1], (2), 3., 4,5,6 atau format bernomor lainnya
-      3. JANGAN GUNAKAN KURUNG SIKU KOSONG [] DI MANA PUN
-      4. Gunakan bahasa natural seperti manusia bicara
-      5. Jangan sertakan referensi pencarian
-      6. Untuk kategori Fraud, tentukan jenis penipuan (Phishing, Malware, Scams) dalam analisis
-      7. Untuk kategori Hoax, sebutkan kata "hoax" dalam analisis
-      
-      ### STRUKTUR JSON:
-      {
-        "status": "Fraud/SPAM/Hoax|PROMO (Bukan Spam)|Normal (Bukan Spam)|MENCURIGAKAN",
-        "tingkat_akurasi": "string (contoh: Tinggi (98%))",
-        "analisis": ["poin analisis 1", "poin analisis 2"],
-        "rekomendasi": ["saran 1", "saran 2"]
-      }
-      
-      ### CONTOH OUTPUT YANG BENAR:
-      {
-        "status": "Fraud/SPAM/Hoax",
-        "tingkat_akurasi": "Tinggi (98%)",
-        "analisis": [
-          "Pesan mengandung tautan phishing yang mencoba mencuri informasi login",
-          "Menggunakan teknik social engineering untuk menakut-nakuti korban"
-        ],
-        "rekomendasi": [
-          "Jangan klik tautan mencurigakan",
-          "Verifikasi melalui saluran resmi"
-        ]
-      }
-      
-      ---
-      ### PESAN UNTUK DIANALISIS:
-      """
-      ${userInput}
-      """
+    Anda adalah sistem deteksi spam tingkat lanjut. Analisis pesan berikut:
+
+    ### INSTRUKSI:
+    1. Tentukan kategori: 
+      - Fraud (Penipuan)
+      - SPAM (Promosi massal)
+      - Hoax (Berita palsu)
+      - Mencurigakan (Tidak jelas)
+      - PROMO (Promo resmi)
+      - Normal (Biasa)
+
+    2. Untuk Fraud, tentukan jenis:
+      - Phishing: Minta info login/data sensitif
+      - Malware: Berisi tautan/file berbahaya
+      - Scams: Penipuan uang/hadiah
+      - Other: Penipuan lain
+
+    3. Berikan analisis singkat
+    4. Berikan rekomendasi
+
+    ### CONTOH FRAUD PHISHING:
+    {
+      "status": "Fraud",
+      "fraudType": "Phishing",
+      "tingkat_akurasi": "Tinggi (98%)",
+      "analisis": [
+        "Meminta verifikasi akun dengan tautan eksternal",
+        "Menggunakan logo resmi palsu"
+      ],
+      "rekomendasi": [
+        "Jangan klik tautan",
+        "Verifikasi langsung ke situs resmi"
+      ]
+    }
+
+    ### CONTOH SPAM:
+    {
+      "status": "SPAM",
+      "fraudType": "Other",
+      "tingkat_akurasi": "Tinggi (95%)",
+      "analisis": [
+        "Promosi produk massal tanpa personalisasi",
+        "Tidak mengandung ancaman langsung"
+      ],
+      "rekomendasi": [
+        "Mark as spam",
+        "Hapus pesan"
+      ]
+    }
+
+    ### PESAN UNTUK DIANALISIS:
+    """
+    ${userInput}
+    """
     `;
 
     const result = await model.generateContent(prompt);
@@ -87,11 +103,19 @@ const generateFullAnalysis = async (userInput) => {
       parsedData.rekomendasi = parsedData.rekomendasi.map(cleanText);
     }
 
+    if (!parsedData.fraudType) {
+      parsedData.fraudType = 'Other';
+    }
+
     return parsedData;
 
   } catch (error) {
     console.error('AI Generation Core Error:', error);
-    return { error: 'Gagal menghasilkan analisis dari AI.' };
+    return { 
+      error: 'Gagal menghasilkan analisis dari AI.',
+      status: 'MENCURIGAKAN',
+      fraudType: 'Other'
+    };
   }
 };
 
@@ -105,43 +129,28 @@ const generateContentForAPI = async (req, res) => {
     return res.status(500).json({ message: generatedData.error });
   }
 
-  // Ekstrak nilai numerik dari tingkat akurasi
   let accuracyValue = 0;
   const accuracyMatch = generatedData.tingkat_akurasi.match(/\d+(\.\d+)?/);
   if (accuracyMatch) {
     accuracyValue = parseFloat(accuracyMatch[0]);
   }
 
-  // Simpan jika termasuk kategori spam
-  const spamCategories = ['Fraud/SPAM/Hoax', 'MENCURIGAKAN'];
+  await AnalysisLog.create({
+    isSpam: ['Fraud', 'SPAM', 'Hoax', 'Mencurigakan'].includes(generatedData.status),
+    accuracy: accuracyValue,
+    source: 'web'
+  });
+
+  const spamCategories = ['Fraud', 'SPAM', 'Hoax', 'Mencurigakan'];
   if (spamCategories.includes(generatedData.status)) {
     const source = 'web';
-    
-    // Tentukan kategori spesifik
-    let specificCategory = 'SPAM';
-    if (generatedData.analisis.some(a => a.toLowerCase().includes('phishing'))) specificCategory = 'Fraud';
-    if (generatedData.analisis.some(a => a.toLowerCase().includes('hoax'))) specificCategory = 'Hoax';
-    if (generatedData.status === 'MENCURIGAKAN') specificCategory = 'Mencurigakan';
-
-    // Tentukan fraud type
-    let fraudType = 'Other';
-    if (generatedData.analisis.some(a => a.toLowerCase().includes('phishing'))) fraudType = 'Phishing';
-    if (generatedData.analisis.some(a => a.toLowerCase().includes('malware'))) fraudType = 'Malware';
-    if (generatedData.analisis.some(a => a.toLowerCase().includes('scam'))) fraudType = 'Scams';
 
     await createMessage({
       content: prompt,
-      category: specificCategory,
-      fraudType,
+      category: generatedData.status,
+      fraudType: generatedData.fraudType || 'Other',
       imageUrl,
       source
-    });
-
-    // Simpan log analisis
-    await AnalysisLog.create({
-      isSpam: spamCategories.includes(generatedData.status),
-      accuracy: accuracyValue,
-      source: 'web'
     });
   }
 

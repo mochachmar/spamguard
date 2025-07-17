@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import Sidebar from '../ui/Sidebar';
-import Header from '../ui/Header';
 import { BellIcon } from '../icons/InterfaceIcons';
 import MenuIcon from '../icons/MenuIcon'; 
 

@@ -9,7 +9,7 @@ interface DashboardStats {
   modelAccuracy: number;
   spamTrend: { _id: string; count: number }[];
   fraudDistribution: { _id: string; count: number }[];
-  totalChange: number; // Added property
+  totalChange: number; 
 }
 
 const notificationsData: Notification[] = [
@@ -57,12 +57,11 @@ const DashboardPage: React.FC = () => {
     };
     
     fetchStats();
-    const interval = setInterval(fetchStats, 30000); // Refresh setiap 30 detik
+    const interval = setInterval(fetchStats, 30000); 
     
     return () => clearInterval(interval);
   }, []);
 
-  // Format data untuk chart
   const spamTrendData = stats?.spamTrend.map(item => ({
     name: new Date(item._id).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }),
     value: item.count
@@ -73,7 +72,6 @@ const DashboardPage: React.FC = () => {
     value: item.count
   })) || [];
 
-  // Hitung perubahan spam 30 hari
   const spamChange = stats?.spamTrend && stats.spamTrend.length > 0 
     ? ((stats.spamTrend[stats.spamTrend.length - 1].count - stats.spamTrend[0].count) / stats.spamTrend[0].count) * 100
     : 0;
@@ -82,13 +80,13 @@ const DashboardPage: React.FC = () => {
     { 
       title: 'Total Messages Processed', 
       value: stats?.totalProcessed.toLocaleString() || '0', 
-      change: stats ? `${stats.totalChange.toFixed(1)}%` : '0%', 
-      changeType: stats?.totalChange && stats.totalChange >= 0 ? "increase" : "decrease"
+      change: '+0%', 
+      changeType: "increase"
     },
     { 
       title: 'Spam Messages Detected', 
       value: stats?.spamDetected.toLocaleString() || '0', 
-      change: stats ? `${spamChange.toFixed(1)}%` : '0%', 
+      change: `${spamChange.toFixed(1)}%`, 
       changeType: spamChange >= 0 ? "increase" : "decrease"
     },
     { 
@@ -118,7 +116,7 @@ const DashboardPage: React.FC = () => {
           <div className="bg-white p-6 rounded-lg shadow-sm">
             <h3 className="text-lg font-semibold text-gray-800">Spam Detection Rate Over Time</h3>
             <p className="text-3xl font-bold text-gray-900">
-              {stats?.spamTrend ? stats.spamTrend.reduce((sum, day) => sum + day.count, 0) : 0}
+              {stats?.spamDetected || 0}
             </p>
             <p className={`text-sm ${spamChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
               Last 30 Days {spamChange >= 0 ? '+' : ''}{spamChange.toFixed(1)}%
@@ -135,7 +133,9 @@ const DashboardPage: React.FC = () => {
           </div>
           <div className="bg-white p-6 rounded-lg shadow-sm">
             <h3 className="text-lg font-semibold text-gray-800">Percentage Value Fraud Type</h3>
-            <p className="text-3xl font-bold text-gray-900">30 Days</p>
+            <p className={`text-sm ${spamChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              Last 30 Days {spamChange >= 0 ? '+' : ''}{spamChange.toFixed(1)}%
+            </p>
             <div className="h-60 mt-4">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={spamCategoryData} margin={{ top: 5, right: 20, left: -20, bottom: 5 }}>

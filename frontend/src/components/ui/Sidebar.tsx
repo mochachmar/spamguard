@@ -4,7 +4,7 @@ import { ShieldCheckIcon, HomeIcon, MessageIcon, FeedbackIcon, SettingsIcon, Log
 
 interface SidebarProps {
   onLogout: () => void;
-  onNavigate?: () => void; // Add this new prop
+  onNavigate?: () => void; 
 }
 
 const NavItem: React.FC<{ 
@@ -35,11 +35,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, onNavigate }) => {
   const handleLogoutClick = () => {
     onLogout();
     navigate('/login');
-    onNavigate?.(); // Close sidebar on logout too
+    onNavigate?.(); 
   };
 
   const handleNavClick = () => {
-    onNavigate?.(); // Close sidebar when any nav item is clicked
+    onNavigate?.(); 
   };
 
   return (

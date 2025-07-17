@@ -4,35 +4,40 @@ const MessageSchema = new mongoose.Schema({
   id: {
     type: String,
     required: true,
-    unique: true // Pastikan id unik
+    unique: true,
+    index: true 
   },
   content: {
     type: String,
-    required: true
+    required: true,
+    text: true 
   },
   category: {
     type: String,
     required: true,
-    enum: ['Fraud', 'SPAM', 'Hoax', 'Mencurigakan']
+    enum: ['Fraud', 'SPAM', 'Hoax', 'Mencurigakan'],
+    index: true 
   },
   fraudType: {
     type: String,
+    required: true,
     enum: ['Phishing', 'Malware', 'Scams', 'Other'],
     default: 'Other'
   },
   detectionDate: {
     type: Date,
-    default: Date.now
+    default: Date.now,
+    index: true 
   },
-  imageUrl: {
-    type: String,
-    default: null
-  },
+  imageUrl: String,
   source: {
     type: String,
-    enum: ['telegram', 'web'],
-    required: true
+    required: true,
+    enum: ['telegram', 'web']
   }
 });
+
+MessageSchema.index({ category: 1, fraudType: 1 });
+MessageSchema.index({ detectionDate: -1 });
 
 module.exports = mongoose.model('Message', MessageSchema);
