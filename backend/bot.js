@@ -73,7 +73,7 @@ bot.on('message', async (msg) => {
     return analyzeMessage(chatId, msg.text);
   }
 
-  bot.sendMessage(chatId, '⚠️ Kirim pesan teks atau gambar untuk dianalisis');
+  bot.sendMessage(chatId, 'Selamat datang di Bot SpamGuard by QUASAR 😊 Kirim pesan teks atau gambar untuk dianalisis ya 😉');
 });
 
 async function analyzeMessage(chatId, userInput, imageFilename = null) {
