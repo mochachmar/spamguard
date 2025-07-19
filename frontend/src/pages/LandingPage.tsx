@@ -79,7 +79,7 @@ const AnalysisResult: React.FC<{ result: AnalysisResultData }> = ({ result }) =>
     titleColor = 'text-blue-700';
     icon = <ShieldIcon className="h-5 w-5 text-blue-500" />;
   }
-  if (result.status.includes('MENCURIGAKAN')) {
+  if (result.status.includes('Mencurigakan')) {
     bgColor = 'bg-yellow-50';
     borderColor = 'border-yellow-500';
     titleColor = 'text-yellow-700';
