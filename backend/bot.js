@@ -6,6 +6,7 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const AnalysisLog = require('./models/AnalysisLogModel');
+const Setting = require('./models/SettingModel');
 
 require('dotenv').config();
 
@@ -37,11 +38,33 @@ if (!fs.existsSync(uploadDir)) {
 bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
 
+  const isActive = await isWithinActiveHours();
+  if (!isActive) {
+    const settings = await Setting.findOne();
+    const start = settings?.activeHours?.start ?? 8;
+    const end = settings?.activeHours?.end ?? 17;
+    return bot.sendMessage(
+      chatId,
+      `⏰ Bot hanya aktif pukul ${start}:00 - ${end}:00`
+    );
+  }
+
   if (msg.text === '/start') {
     return bot.sendMessage(
       chatId,
       '🔍 Kirimkan pesan teks/gambar untuk analisis deteksi penipuan!\nSaya akan cek: Fraud, Spam, Promo, atau Pesan Normal.'
     );
+  }
+  
+  if (msg.text) {
+    const settings = await Setting.findOne();
+    const minChar = settings?.minCharLength ?? 20;
+    if (msg.text.length < minChar) {
+      return bot.sendMessage(
+        chatId,
+        `❌ Pesan terlalu pendek! Minimal ${minChar} karakter`
+      );
+    }
   }
 
   if (msg.photo) {
@@ -133,6 +156,15 @@ async function analyzeMessage(chatId, userInput, imageFilename = null) {
     
     bot.sendMessage(chatId, '⚠️ Gagal menganalisis pesan. Pesan telah dicatat sebagai mencurigakan.');
   }
+}
+
+async function isWithinActiveHours() {
+  const settings = await Setting.findOne();
+  if (!settings) return true;
+
+  const now = new Date();
+  const currentHour = now.getHours();
+  return currentHour >= settings.activeHours.start && currentHour < settings.activeHours.end;
 }
 
 function getStatusEmoji(status) {
