@@ -6,8 +6,18 @@ const SettingSchema = new mongoose.Schema({
     default: 20
   },
   activeHours: {
-    start: { type: Number, default: 8 },
-    end: { type: Number, default: 17 }
+    start: { 
+      type: Number, 
+      default: 8,
+      min: 0,
+      max: 23
+    },
+    end: { 
+      type: Number, 
+      default: 17,
+      min: 0,
+      max: 23
+    }
   }
 });
 

@@ -24,6 +24,7 @@ app.use('/api/messages', require('./routes/messageRoutes'));
 app.use('/messages', express.static(path.join(__dirname, 'uploads', 'images')));
 app.use('/api/uploads', require('./routes/fileRoutes'));
 app.use('/api/dashboard', require('./routes/dashboardRoutes'));
+app.use('/api/setting', require('./routes/settingRoutes'));
 
 const PORT = process.env.PORT || 5000;
 

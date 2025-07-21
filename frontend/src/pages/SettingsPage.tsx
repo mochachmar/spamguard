@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 export const getBotSettings = async () => {
-  const response = await axios.get('/api/settings');
+  const response = await axios.get('http://localhost:5000/api/setting/settings');
   return response.data;
 };
 
 export const updateBotSettings = async (settings: any) => {
-  const response = await axios.put('/api/settings', settings);
+  const response = await axios.put('http://localhost:5000/api/setting/update/settings', settings);
   return response.data;
 };
 
@@ -40,14 +40,31 @@ const SettingsPage: React.FC = () => {
   }, []);
 
   const handleSaveBotSettings = async () => {
-    try {
-      await updateBotSettings(botSettings);
-      alert('Pengaturan bot berhasil disimpan!');
-    } catch (error) {
-      console.error("Gagal menyimpan pengaturan:", error);
-      alert('Gagal menyimpan pengaturan bot!');
+  try {
+    const settingsToSave = {
+      minCharLength: botSettings.minCharLength,
+      activeHours: {
+        start: botSettings.activeHours.start,
+        end: botSettings.activeHours.end
+      }
+    };
+    
+    await updateBotSettings(settingsToSave);
+    alert('Pengaturan bot berhasil disimpan!');
+  } catch (error) {
+    console.error("Gagal menyimpan pengaturan:", error);
+    
+    let errorMessage = '';
+    if (axios.isAxiosError(error)) {
+      errorMessage = error.response?.data?.error || error.message;
+    } else if (error instanceof Error) {
+      errorMessage = error.message;
+    } else {
+      errorMessage = String(error);
     }
-  };
+    alert(`Gagal menyimpan pengaturan bot! ${errorMessage}`);
+  }
+};
 
   return (
     <div className="max-w-4xl mx-auto space-y-12">

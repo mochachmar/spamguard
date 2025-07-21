@@ -27,12 +27,16 @@ exports.updateSettings = async (req, res) => {
     }
 
     if (activeHours) {
-      settings.activeHours = activeHours;
+      settings.activeHours = {
+        start: activeHours.start,
+        end: activeHours.end
+      };
     }
 
     await settings.save();
     res.json(settings);
   } catch (error) {
+    console.error('Update settings error:', error);
     res.status(500).json({ error: error.message });
   }
 };
