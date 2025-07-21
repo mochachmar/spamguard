@@ -45,10 +45,10 @@ const SettingsPage: React.FC = () => {
         <h2 className="text-xl font-bold text-gray-900 border-b pb-4">Admin Profile</h2>
         <div className="pt-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-8">
-                <img className="h-24 w-24 rounded-full" src="https://i.pravatar.cc/150?u=ethan" alt="Profile" />
+                <img className="h-24 w-24 rounded-full" src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="Profile" />
                 <div className="flex-grow">
-                    <p className="text-lg font-bold text-gray-800">Ethan Carter</p>
-                    <p className="text-sm text-gray-500">ethan.carter@example.com</p>
+                    <p className="text-lg font-bold text-gray-800">Moch Achmar</p>
+                    <p className="text-sm text-gray-500">mochachmar@gmail.com</p>
                 </div>
                 <button className="px-4 py-2 bg-gray-100 text-gray-800 font-medium rounded-md hover:bg-gray-200">
                     Change Photo
@@ -57,11 +57,11 @@ const SettingsPage: React.FC = () => {
             <form className="space-y-4">
                 <div>
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
-                    <input type="text" id="name" defaultValue="Ethan Carter" className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                    <input type="text" id="name" defaultValue="Moch Achmar" className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
                 </div>
                 <div>
                     <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
-                    <input type="email" id="email" defaultValue="ethan.carter@example.com" className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                    <input type="email" id="email" defaultValue="mochachmar@gmail.com" className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
                 </div>
                 <div>
                     <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>

@@ -69,11 +69,10 @@ const Header: React.FC<HeaderProps> = ({ onNavClick }) => {
               How It Works
             </a>
             <a 
-              href="#pricing" 
-              onClick={(e) => handleNavClick(e, '#pricing')} 
+              onClick={() => navigate('/guides')} // Changed from '/login'
               className="text-gray-600 hover:text-slate-800 font-medium"
             >
-              Pricing
+              Guides
             </a>
           </div>
 
@@ -121,15 +120,11 @@ const Header: React.FC<HeaderProps> = ({ onNavClick }) => {
                 How It Works
               </a>
               <a 
-                href="#pricing" 
-                onClick={(e) => {
-                  handleNavClick(e, '#pricing');
-                  setMobileMenuOpen(false);
-                }} 
-                className="text-gray-600 hover:text-slate-800 font-medium"
-              >
-                Pricing
-              </a>
+              onClick={() => navigate('/guides')} // Changed from '/login'
+              className="text-gray-600 hover:text-slate-800 font-medium"
+            >
+              Guides
+            </a>
             </div>
             <div className="flex space-x-4 mt-4">
               <button 

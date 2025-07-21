@@ -9,6 +9,7 @@ import FeedbackPage from './src/pages/FeedbackPage';
 import SettingsPage from './src/pages/SettingsPage';
 import NotificationsPage from './src/pages/NotificationsPage';
 import LandingPage from './src/pages/LandingPage';
+import GuidesPage from './src/pages/GuidesPage';
 import LoginPage from './src/pages/LoginPage';
 import RegisterPage from './src/pages/RegisterPage';
 import ForgotPasswordPage from './src/pages/ForgotPasswordPage';
@@ -41,6 +42,7 @@ function App() {
         ) : (
           <Route path="/" element={<PublicLayout />}>
             <Route index element={<LandingPage />} />
+            <Route path="guides" element={<GuidesPage />} />
             <Route path="login" element={<LoginPage onLogin={handleLogin} />} />
             <Route path="register" element={<RegisterPage />} />
             <Route path="forgot-password" element={<ForgotPasswordPage />} />
