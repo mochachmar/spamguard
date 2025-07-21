@@ -120,7 +120,7 @@ const Header: React.FC<HeaderProps> = ({ onNavClick }) => {
                 How It Works
               </a>
               <a 
-              onClick={() => navigate('/guides')} // Changed from '/login'
+              onClick={() => navigate('/guides')} 
               className="text-gray-600 hover:text-slate-800 font-medium"
             >
               Guides

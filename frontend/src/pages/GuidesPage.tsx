@@ -10,7 +10,6 @@ import {
   SparklesIcon
 } from '../components/icons/InterfaceIcons';
 
-// Component for each guide card
 const GuideCard: React.FC<{ icon: React.ReactNode; title: string; description: string }> = ({ 
   icon, 
   title, 
@@ -23,7 +22,6 @@ const GuideCard: React.FC<{ icon: React.ReactNode; title: string; description: s
   </div>
 );
 
-// Component for each section (Tutorials and Tips)
 const GuideSection: React.FC<{ 
   title: string; 
   subtitle: string; 
