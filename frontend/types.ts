@@ -34,5 +34,6 @@ export interface BotSettings {
     reportToTelegram: boolean;
     restrictUser: boolean;
   };
+  enableMessageNotifications?: boolean;
 }
 

@@ -15,7 +15,7 @@ exports.getSettings = async (req, res) => {
 
 exports.updateSettings = async (req, res) => {
   try {
-    const { minCharLength, activeHours, botActions } = req.body;
+    const { minCharLength, activeHours, botActions, enableMessageNotifications } = req.body;
     let settings = await Setting.findOne();
     
     if (!settings) {
@@ -41,6 +41,10 @@ exports.updateSettings = async (req, res) => {
         reportToTelegram: botActions.reportToTelegram || false,
         restrictUser: botActions.restrictUser || false
       };
+    }
+
+    if (enableMessageNotifications !== undefined) {
+      settings.enableMessageNotifications = enableMessageNotifications;
     }
 
     await settings.save();

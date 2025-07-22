@@ -25,6 +25,10 @@ const SettingSchema = new mongoose.Schema({
     deleteAllMessages: { type: Boolean, default: false },
     reportToTelegram: { type: Boolean, default: false },
     restrictUser: { type: Boolean, default: false }
+  },
+  enableMessageNotifications: {
+    type: Boolean,
+    default: true
   }
 });
 

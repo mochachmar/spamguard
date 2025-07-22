@@ -82,7 +82,7 @@ bot.on('message', async (msg) => {
       );
       
       if (!text.trim()) throw new Error('Tidak ada teks terdeteksi');
-      return analyzeMessage(chatId, text, filename);
+      return analyzeMessage(chatId, text, filename, msg);
     } catch (error) {
       console.error('OCR Error:', error);
       return bot.sendMessage(chatId, '❌ Gagal membaca teks di gambar. Pastikan gambar jelas dan mengandung teks.');
@@ -90,13 +90,13 @@ bot.on('message', async (msg) => {
   }
 
   if (msg.text) {
-    return analyzeMessage(chatId, msg.text);
+    return analyzeMessage(chatId, msg.text, null, msg);
   }
 
   bot.sendMessage(chatId, 'Selamat datang di Bot SpamGuard by QUASAR 😊 Kirim pesan teks atau gambar untuk dianalisis ya 😉');
 });
 
-async function analyzeMessage(chatId, userInput, imageFilename = null) {
+async function analyzeMessage(chatId, userInput, imageFilename = null, msg) {
   try {
     bot.sendMessage(chatId, '🤖 Sedang menganalisis...');
     
@@ -139,93 +139,62 @@ async function analyzeMessage(chatId, userInput, imageFilename = null) {
         source: 'telegram'
       });
 
-  const settings = await Setting.findOne();
-  const isGroup = msg.chat.type !== 'private';
-  
-  if (isGroup && settings?.botActions) {
-    const { botActions } = settings;
-    const userId = msg.from.id;
-    const chatId = msg.chat.id;
-    const messageId = msg.message_id;
-    const userName = msg.from.first_name || msg.from.username || 'pengguna';
+      const settings = await Setting.findOne();
+      const isGroup = msg.chat.type !== 'private';
+      const userId = msg.from.id;
+      const messageId = msg.message_id;
+      const userName = msg.from.first_name || msg.from.username || 'pengguna';
+      const groupName = msg.chat.title || 'grup ini';
 
-    if (botActions.deleteMessage) {
-      try {
-        await bot.deleteMessage(chatId, messageId);
-        console.log(`✅ Deleted spam message from ${userName}`);
-      } catch (error) {
-        console.error('Delete message error:', error);
+      if (settings?.enableMessageNotifications) {
+        try {
+          const adminId = process.env.ADMIN_ID;
+          if (adminId) {
+            const source = imageFilename ? 'gambar' : 'teks';
+            const notification = `🚨 PESAN SPAM TERDETEKSI!\n\n` +
+              `• Jenis: ${analysis.status} (${analysis.fraudType})\n` +
+              `• Akurasi: ${analysis.tingkat_akurasi}\n` +
+              `• Sumber: ${source}\n` +
+              `• Grup: ${groupName}\n` +
+              `• Pengirim: ${userName}\n\n` +
+              `Pesan: ${userInput.substring(0, 200)}...`;
+            
+            bot.sendMessage(adminId, notification);
+          }
+        } catch (error) {
+          console.error('Gagal mengirim notifikasi:', error);
+        }
       }
-    }
 
-    if (botActions.blockUser) {
-      try {
-        await bot.banChatMember(chatId, userId);
-        console.log(`✅ Banned spam user: ${userName}`);
+      if (isGroup && settings?.botActions) {
+        const { botActions } = settings;
+
+        if (botActions.deleteMessage) {
+          try {
+            await bot.deleteMessage(chatId, messageId);
+            console.log(`✅ Deleted spam message from ${userName}`);
+          } catch (error) {
+            console.error('Delete message error:', error);
+          }
+        }
+
+        if (botActions.blockUser) {
+          await sendActionNotification(chatId, 'blockUser', userName, groupName, userId);
+        }
         
-        const adminId = process.env.ADMIN_ID;
-        if (adminId) {
-          bot.sendMessage(
-            adminId,
-            `🚫 Pengguna ${userName} telah diblokir di grup ${msg.chat.title} karena spam`
-          );
+        if (botActions.deleteAllMessages) {
+          await sendActionNotification(chatId, 'deleteAllMessages', userName, groupName, userId);
         }
-      } catch (error) {
-        console.error('Block user error:', error);
-      }
-    }
-
-    if (botActions.restrictUser) {
-      try {
-        const untilDate = Math.floor(Date.now() / 1000) + 60 * 60 * 24; 
-        await bot.restrictChatMember(chatId, userId, {
-          can_send_messages: false,
-          until_date: untilDate
-        });
-        console.log(`✅ Restricted user: ${userName}`);
-      } catch (error) {
-        console.error('Restrict user error:', error);
-      }
-    }
-
-    // 4. Hapus semua pesan (beta)
-    if (botActions.deleteAllMessages) {
-      try {
-        // Catatan: Telegram tidak menyediakan API untuk menghapus semua pesan
-        // Solusi alternatif: kirim notifikasi ke admin
-        const adminId = process.env.ADMIN_ID;
-        if (adminId) {
-          bot.sendMessage(
-            adminId,
-            `⚠️ HAPUS SEMUA PESAN DARI ${userName} DI GRUP ${msg.chat.title}\n` +
-            `Silakan hapus manual semua pesan dari pengguna ini di grup.`
-          );
+        
+        if (botActions.reportToTelegram) {
+          await sendActionNotification(chatId, 'reportToTelegram', userName, groupName, userId);
         }
-      } catch (error) {
-        console.error('Delete all messages error:', error);
-      }
-    }
-
-    // 5. Laporkan ke Telegram (beta)
-    if (botActions.reportToTelegram) {
-      try {
-        // Catatan: Tidak ada API langsung untuk melaporkan
-        // Solusi alternatif: kirim notifikasi ke admin
-        const adminId = process.env.ADMIN_ID;
-        if (adminId) {
-          bot.sendMessage(
-            adminId,
-            `⚠️ LAPORKAN PENGIRIM SPAM: ${userName} DI GRUP ${msg.chat.title}\n` +
-            `Silakan laporkan pengguna ini melalui menu report di Telegram.`
-          );
+        
+        if (botActions.restrictUser) {
+          await sendActionNotification(chatId, 'restrictUser', userName, groupName, userId);
         }
-      } catch (error) {
-        console.error('Report to Telegram error:', error);
       }
     }
-  }
-    }
-
   } catch (error) {
     console.error('Analysis Error:', error);
     
@@ -241,7 +210,7 @@ async function analyzeMessage(chatId, userInput, imageFilename = null) {
   }
 }
 
-async function sendActionNotification(chatId, actionType, userName, groupName) {
+async function sendActionNotification(chatId, actionType, userName, groupName, userId) {
   const actions = {
     blockUser: `🚫 Anda akan memblokir ${userName} di grup ${groupName}.`,
     deleteAllMessages: `🧹 Anda akan menghapus semua pesan dari ${userName} di grup ${groupName}.`,
@@ -254,7 +223,10 @@ async function sendActionNotification(chatId, actionType, userName, groupName) {
   const options = {
     reply_markup: {
       inline_keyboard: [
-        [{ text: 'Ya', callback_data: `confirm_${actionType}` }],
+        [{ 
+          text: 'Ya', 
+          callback_data: `confirm_${actionType}_${userId}_${chatId}_${userName}_${groupName}` 
+        }],
         [{ text: 'Tidak', callback_data: 'cancel_action' }]
       ]
     }
@@ -268,10 +240,42 @@ bot.on('callback_query', async (callbackQuery) => {
   const chatId = message.chat.id;
 
   if (data.startsWith('confirm_')) {
-    const actionType = data.split('_')[1];
-    await bot.answerCallbackQuery(callbackQuery.id, { text: 'Tindakan dikonfirmasi!' });
+    const [_, actionType, userId, targetChatId, userName, groupName] = data.split('_');
+    
+    try {
+      switch(actionType) {
+        case 'blockUser':
+          await bot.banChatMember(targetChatId, userId);
+          await bot.sendMessage(chatId, `✅ Pengguna ${userName} telah diblokir dari grup ${groupName}`);
+          break;
+          
+        case 'deleteAllMessages':
+          await bot.sendMessage(chatId, `⚠️ Silakan hapus manual semua pesan dari ${userName} di grup ${groupName}`);
+          break;
+          
+        case 'reportToTelegram':
+          await bot.sendMessage(chatId, `⚠️ Silakan laporkan ${userName} secara manual melalui menu report Telegram`);
+          break;
+          
+        case 'restrictUser':
+          const untilDate = Math.floor(Date.now() / 1000) + 60 * 60 * 24; 
+          await bot.restrictChatMember(targetChatId, userId, {
+            can_send_messages: false,
+            until_date: untilDate
+          });
+          await bot.sendMessage(chatId, `✅ Akses ${userName} telah dibatasi di grup ${groupName} selama 24 jam`);
+          break;
+      }
+      
+      await bot.answerCallbackQuery(callbackQuery.id, { text: 'Tindakan berhasil dilakukan!' });
+    } catch (error) {
+      console.error(`Error melakukan tindakan ${actionType}:`, error);
+      await bot.answerCallbackQuery(callbackQuery.id, { text: 'Gagal melakukan tindakan' });
+      await bot.sendMessage(chatId, `❌ Gagal melakukan tindakan ${actionType} pada ${userName}`);
+    }
   } else if (data === 'cancel_action') {
     await bot.answerCallbackQuery(callbackQuery.id, { text: 'Tindakan dibatalkan' });
+    await bot.sendMessage(chatId, 'Tindakan telah dibatalkan');
   }
 });
 

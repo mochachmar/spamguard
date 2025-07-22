@@ -1,10 +1,14 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { createMessage } = require('./messageControllers');
 const AnalysisLog = require('../models/AnalysisLogModel');
+const Setting = require('../models/SettingModel');
+const TelegramBot = require('node-telegram-bot-api');
 
 require('dotenv').config();
 
 const genAI = new GoogleGenerativeAI(process.env.API_KEY);
+const token = process.env.TELEGRAM_BOT_TOKEN;
+const bot = new TelegramBot(token);
 
 const cleanText = (text) => {
   return text
@@ -152,6 +156,25 @@ const generateContentForAPI = async (req, res) => {
       imageUrl,
       source
     });
+
+  const settings = await Setting.findOne();
+    if (settings?.enableMessageNotifications) {
+      try {
+        const adminId = process.env.ADMIN_ID;
+        if (adminId) {
+          const source = imageUrl ? 'gambar' : 'teks';
+          const notification = `🚨 PESAN SPAM TERDETEKSI DARI WEB!\n\n` +
+            `• Jenis: ${generatedData.status} (${generatedData.fraudType})\n` +
+            `• Akurasi: ${generatedData.tingkat_akurasi}\n` +
+            `• Sumber: ${source}\n\n` +
+            `Pesan: ${prompt.substring(0, 200)}...`;
+          
+          bot.sendMessage(adminId, notification);
+        }
+      } catch (error) {
+        console.error('Gagal mengirim notifikasi:', error);
+      }
+    }
   }
 
   res.status(200).json(generatedData);

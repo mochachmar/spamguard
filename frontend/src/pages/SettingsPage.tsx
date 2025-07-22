@@ -26,7 +26,8 @@ const SettingsPage: React.FC = () => {
       deleteAllMessages: false,
       reportToTelegram: false,
       restrictUser: false
-    }
+    },
+    enableMessageNotifications: true 
   });
 
   useEffect(() => {
@@ -45,8 +46,17 @@ const SettingsPage: React.FC = () => {
             deleteAllMessages: false,
             reportToTelegram: false,
             restrictUser: false
-          }
+          },
+          enableMessageNotifications: settings.enableMessageNotifications !== undefined 
+            ? settings.enableMessageNotifications 
+            : true
         });
+        
+        setNotificationsEnabled(
+          settings.enableMessageNotifications !== undefined 
+            ? settings.enableMessageNotifications 
+            : true
+        );
       } catch (error) {
         console.error("Gagal memuat pengaturan:", error);
       }
@@ -62,7 +72,8 @@ const SettingsPage: React.FC = () => {
           start: botSettings.activeHours.start,
           end: botSettings.activeHours.end
         },
-        botActions: botSettings.botActions 
+        botActions: botSettings.botActions,
+        enableMessageNotifications: notificationsEnabled
       };
       
       await updateBotSettings(settingsToSave);
@@ -89,12 +100,14 @@ const SettingsPage: React.FC = () => {
         <p className="mt-1 text-gray-600">Manage your application and profile settings.</p>
       </div>
       
-      <div className="bg-white p-8 rounded-lg shadow-sm">
+       <div className="bg-white p-8 rounded-lg shadow-sm">
         <h2 className="text-xl font-bold text-gray-900 border-b pb-4">Notifications</h2>
         <div className="flex items-center justify-between pt-6">
           <div>
-            <h3 className="font-semibold text-gray-800">Email Notifications</h3>
-            <p className="text-sm text-gray-500">Receive email notifications when spam is detected.</p>
+            <h3 className="font-semibold text-gray-800">Message Notifications</h3>
+            <p className="text-sm text-gray-500">
+              Receive message notifications when spam is detected.
+            </p>
           </div>
           <button
             onClick={() => setNotificationsEnabled(!notificationsEnabled)}
