@@ -201,7 +201,7 @@ Bot akan otomatis berjalan bersamaan dengan backend.
   </li>
 </ol>
 
-<h3>Our Team :</h3>
+<h3>Our Team AI 3-2:</h3>
 <div style="display: flex; align-items: center;">
   <img src="images.jpg" alt="Struktural Project" width="400"/>
 </div>
