@@ -15,7 +15,7 @@ exports.getSettings = async (req, res) => {
 
 exports.updateSettings = async (req, res) => {
   try {
-    const { minCharLength, activeHours } = req.body;
+    const { minCharLength, activeHours, botActions } = req.body;
     let settings = await Setting.findOne();
     
     if (!settings) {
@@ -30,6 +30,16 @@ exports.updateSettings = async (req, res) => {
       settings.activeHours = {
         start: activeHours.start,
         end: activeHours.end
+      };
+    }
+
+    if (botActions) {
+      settings.botActions = {
+        deleteMessage: botActions.deleteMessage || false,
+        blockUser: botActions.blockUser || false,
+        deleteAllMessages: botActions.deleteAllMessages || false,
+        reportToTelegram: botActions.reportToTelegram || false,
+        restrictUser: botActions.restrictUser || false
       };
     }
 

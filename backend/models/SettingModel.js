@@ -18,6 +18,13 @@ const SettingSchema = new mongoose.Schema({
       min: 0,
       max: 23
     }
+  },
+  botActions: {
+    deleteMessage: { type: Boolean, default: false },
+    blockUser: { type: Boolean, default: false },
+    deleteAllMessages: { type: Boolean, default: false },
+    reportToTelegram: { type: Boolean, default: false },
+    restrictUser: { type: Boolean, default: false }
   }
 });
 

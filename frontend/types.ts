@@ -21,3 +21,18 @@ export interface NotificationItem {
   time: string;
 }
 
+export interface BotSettings {
+  minCharLength: number;
+  activeHours: { 
+    start: number; 
+    end: number;   
+  };
+  botActions?: {
+    deleteMessage: boolean;
+    blockUser: boolean;
+    deleteAllMessages: boolean;
+    reportToTelegram: boolean;
+    restrictUser: boolean;
+  };
+}
+

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { BotSettings } from '../../types';
 
 export const getBotSettings = async () => {
   const response = await axios.get('http://localhost:5000/api/setting/settings');
@@ -13,11 +14,18 @@ export const updateBotSettings = async (settings: any) => {
 
 const SettingsPage: React.FC = () => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [botSettings, setBotSettings] = useState({
+  const [botSettings, setBotSettings] = useState<BotSettings>({
     minCharLength: 20,
     activeHours: { 
       start: 8, 
       end: 17   
+    },
+    botActions: { 
+      deleteMessage: false,
+      blockUser: false,
+      deleteAllMessages: false,
+      reportToTelegram: false,
+      restrictUser: false
     }
   });
 
@@ -30,6 +38,13 @@ const SettingsPage: React.FC = () => {
           activeHours: {
             start: settings.activeHours?.start || 8,
             end: settings.activeHours?.end || 17
+          },
+          botActions: settings.botActions || {
+            deleteMessage: false,
+            blockUser: false,
+            deleteAllMessages: false,
+            reportToTelegram: false,
+            restrictUser: false
           }
         });
       } catch (error) {
@@ -40,31 +55,32 @@ const SettingsPage: React.FC = () => {
   }, []);
 
   const handleSaveBotSettings = async () => {
-  try {
-    const settingsToSave = {
-      minCharLength: botSettings.minCharLength,
-      activeHours: {
-        start: botSettings.activeHours.start,
-        end: botSettings.activeHours.end
+    try {
+      const settingsToSave = {
+        minCharLength: botSettings.minCharLength,
+        activeHours: {
+          start: botSettings.activeHours.start,
+          end: botSettings.activeHours.end
+        },
+        botActions: botSettings.botActions 
+      };
+      
+      await updateBotSettings(settingsToSave);
+      alert('Pengaturan bot berhasil disimpan!');
+    } catch (error) {
+      console.error("Gagal menyimpan pengaturan:", error);
+      
+      let errorMessage = '';
+      if (axios.isAxiosError(error)) {
+        errorMessage = error.response?.data?.error || error.message;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      } else {
+        errorMessage = String(error);
       }
-    };
-    
-    await updateBotSettings(settingsToSave);
-    alert('Pengaturan bot berhasil disimpan!');
-  } catch (error) {
-    console.error("Gagal menyimpan pengaturan:", error);
-    
-    let errorMessage = '';
-    if (axios.isAxiosError(error)) {
-      errorMessage = error.response?.data?.error || error.message;
-    } else if (error instanceof Error) {
-      errorMessage = error.message;
-    } else {
-      errorMessage = String(error);
+      alert(`Gagal menyimpan pengaturan bot! ${errorMessage}`);
     }
-    alert(`Gagal menyimpan pengaturan bot! ${errorMessage}`);
-  }
-};
+  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-12">
@@ -93,6 +109,97 @@ const SettingsPage: React.FC = () => {
       
       <div className="bg-white p-8 rounded-lg shadow-sm">
   <h2 className="text-xl font-bold text-gray-900 border-b pb-4">Bot Settings</h2>
+  <div className="space-y-4 pt-4">
+    <div className="flex items-center">
+      <input 
+        type="checkbox" 
+        checked={botSettings.botActions?.deleteMessage || false}
+        onChange={() => setBotSettings({
+          ...botSettings,
+          botActions: {
+            ...botSettings.botActions,
+            deleteMessage: !botSettings.botActions?.deleteMessage
+          }
+        })}
+        className="h-4 w-4 text-slate-700 focus:ring-slate-700 border-gray-300 rounded"
+      />
+      <label className="ml-2 block text-sm text-gray-900">
+        Otomatis hapus pesan spam
+      </label>
+    </div>
+    
+    <div className="flex items-center">
+      <input 
+        type="checkbox" 
+        checked={botSettings.botActions?.blockUser || false}
+        onChange={() => setBotSettings({
+          ...botSettings,
+          botActions: {
+            ...botSettings.botActions,
+            blockUser: !botSettings.botActions?.blockUser
+          }
+        })}
+        className="h-4 w-4 text-slate-700 focus:ring-slate-700 border-gray-300 rounded"
+      />
+      <label className="ml-2 block text-sm text-gray-900">
+        Blokir pengirim spam
+      </label>
+    </div>
+    
+    <div className="flex items-center">
+      <input 
+        type="checkbox" 
+        checked={botSettings.botActions?.deleteAllMessages || false}
+        onChange={() => setBotSettings({
+          ...botSettings,
+          botActions: {
+            ...botSettings.botActions,
+            deleteAllMessages: !botSettings.botActions?.deleteAllMessages
+          }
+        })}
+        className="h-4 w-4 text-slate-700 focus:ring-slate-700 border-gray-300 rounded"
+      />
+      <label className="ml-2 block text-sm text-gray-900">
+        Hapus semua pesan dari pengirim
+      </label>
+    </div>
+    
+    <div className="flex items-center">
+      <input 
+        type="checkbox" 
+        checked={botSettings.botActions?.reportToTelegram || false}
+        onChange={() => setBotSettings({
+          ...botSettings,
+          botActions: {
+            ...botSettings.botActions,
+            reportToTelegram: !botSettings.botActions?.reportToTelegram
+          }
+        })}
+        className="h-4 w-4 text-slate-700 focus:ring-slate-700 border-gray-300 rounded"
+      />
+      <label className="ml-2 block text-sm text-gray-900">
+        Laporkan ke Telegram
+      </label>
+    </div>
+    
+    <div className="flex items-center">
+      <input 
+        type="checkbox" 
+        checked={botSettings.botActions?.restrictUser || false}
+        onChange={() => setBotSettings({
+          ...botSettings,
+          botActions: {
+            ...botSettings.botActions,
+            restrictUser: !botSettings.botActions?.restrictUser
+          }
+        })}
+        className="h-4 w-4 text-slate-700 focus:ring-slate-700 border-gray-300 rounded"
+      />
+      <label className="ml-2 block text-sm text-gray-900">
+        Batasi akses pengirim
+      </label>
+    </div>
+  </div>
   
   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6">
     <div>
