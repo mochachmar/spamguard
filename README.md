@@ -119,3 +119,89 @@ Bot akan otomatis berjalan bersamaan dengan backend.
 | POST   | `/settings`                  | Update konfigurasi pengaturan         | `{ "spamThreshold": 75, "blockedKeywords": "promo,diskon" }` |
 
 
+<h2>Team Overview 👥</h2>
+<div style="display: flex; align-items: center; gap: 8px;">
+  <span><strong>Project Manager:</strong> Muhammad Darrel Prawira</span>
+  <a href="https://www.linkedin.com/in/dapraws/">
+      <img src="https://skillicons.dev/icons?i=linkedin" alt="LinkedIn" style="height: 24px;">
+  </a>
+</div>
+
+<h3>AI Division🤖</h3>
+
+<ol>
+  <li>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span><strong>AI/ML Engineer :</strong> Riandra Diva Auzan</span>
+      <a href="https://www.linkedin.com/in/riandradivaauzan/">
+          <img src="https://skillicons.dev/icons?i=linkedin" alt="LinkedIn" style="height: 24px;">
+      </a>
+    </div>
+  </li>
+  <li>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span><strong>Data Engineer :</strong> Moch Achmar</span>
+      <a href="https://www.linkedin.com/in/moch-achmar">
+          <img src="https://skillicons.dev/icons?i=linkedin" alt="LinkedIn" style="height: 24px;">
+      </a>
+    </div>
+  </li>
+</ol>
+
+<h3>Web Development Division 🌐</h3>
+
+<ol>
+  <li><strong>Hipster</strong>
+    <ul>
+      <li>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span>Moch Achmar</span>
+          <a href="https://www.linkedin.com/in/moch-achmar">
+              <img src="https://skillicons.dev/icons?i=linkedin" alt="LinkedIn" style="height: 24px;">
+          </a>
+        </div>
+      </li>
+      <li>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span>Muhammad Faqih Maulana</span>
+          <a href="https://www.linkedin.com/in/faqhmlna/">
+              <img src="https://skillicons.dev/icons?i=linkedin" alt="LinkedIn" style="height: 24px;">
+          </a>
+        </div>
+      </li>
+      <li>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span>Hani Dwi Rahma Yulizar</span>
+          <a href="https://www.linkedin.com/in/hani-dwi-rahma-yulizar-597620311/">
+              <img src="https://skillicons.dev/icons?i=linkedin" alt="LinkedIn" style="height: 24px;">
+          </a>
+        </div>
+      </li>
+    </ul>
+  </li>
+  <li><strong>Hacker</strong>
+    <ul>
+      <li>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span>Moch Achmar</span>
+          <a href="[https://www.linkedin.com/in/muhammad-haykal-islam-baskoro-baskoro-7b6154250/](https://www.linkedin.com/in/moch-achmar)">
+              <img src="https://skillicons.dev/icons?i=linkedin" alt="LinkedIn" style="height: 24px;">
+          </a>
+        </div>
+      </li>
+      <li>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span>Kusdhani Ilham</span>
+          <a href="https://www.linkedin.com/in/kusdhani-ilham/">
+              <img src="https://skillicons.dev/icons?i=linkedin" alt="LinkedIn" style="height: 24px;">
+          </a>
+        </div>
+      </li>
+    </ul>
+  </li>
+</ol>
+
+</br>
+</br>
+
+<div style="display: flex; align-items: center;">
