@@ -69,8 +69,8 @@ const Header: React.FC<HeaderProps> = ({ onNavClick }) => {
               How It Works
             </a>
             <a 
-              onClick={() => navigate('/guides')} // Changed from '/login'
-              className="text-gray-600 hover:text-slate-800 font-medium"
+              onClick={() => navigate('/guides')}
+              className="text-gray-600 hover:text-slate-800 font-medium hover:cursor-pointer"
             >
               Guides
             </a>
@@ -120,11 +120,11 @@ const Header: React.FC<HeaderProps> = ({ onNavClick }) => {
                 How It Works
               </a>
               <a 
-              onClick={() => navigate('/guides')} 
-              className="text-gray-600 hover:text-slate-800 font-medium"
-            >
-              Guides
-            </a>
+                onClick={() => navigate('/guides')} 
+                className="text-gray-600 hover:text-slate-800 font-medium hover:cursor-pointer"
+              >
+                Guides
+              </a>
             </div>
             <div className="flex space-x-4 mt-4">
               <button 
