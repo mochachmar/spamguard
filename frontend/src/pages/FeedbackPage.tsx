@@ -47,7 +47,7 @@ const FeedbackPage: React.FC = () => {
                 <p className="mt-1 text-gray-600 text-sm mb-4">View performance metrics to understand the effectiveness of the spam detection system.</p>
                  <div className="p-6 rounded-lg">
                     <h3 className="text-lg font-semibold text-gray-800">Spam Detection Accuracy</h3>
-                    <p className="text-4xl font-bold text-gray-900">95%</p>
+                    <p className="text-4xl font-bold text-gray-900">89.0%</p>
                     <p className="text-sm text-green-600">Last 30 Days +2%</p>
                     <div className="h-80 mt-4">
                         <ResponsiveContainer width="100%" height="100%">

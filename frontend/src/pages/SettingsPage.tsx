@@ -137,7 +137,7 @@ const SettingsPage: React.FC = () => {
         className="h-4 w-4 text-slate-700 focus:ring-slate-700 border-gray-300 rounded"
       />
       <label className="ml-2 block text-sm text-gray-900">
-        Otomatis hapus pesan spam
+        Automatically delete spam messages
       </label>
     </div>
     
@@ -155,7 +155,7 @@ const SettingsPage: React.FC = () => {
         className="h-4 w-4 text-slate-700 focus:ring-slate-700 border-gray-300 rounded"
       />
       <label className="ml-2 block text-sm text-gray-900">
-        Blokir pengirim spam
+        Block spam senders
       </label>
     </div>
     
@@ -173,7 +173,7 @@ const SettingsPage: React.FC = () => {
         className="h-4 w-4 text-slate-700 focus:ring-slate-700 border-gray-300 rounded"
       />
       <label className="ml-2 block text-sm text-gray-900">
-        Hapus semua pesan dari pengirim
+        Delete all messages from sender
       </label>
     </div>
     
@@ -191,7 +191,7 @@ const SettingsPage: React.FC = () => {
         className="h-4 w-4 text-slate-700 focus:ring-slate-700 border-gray-300 rounded"
       />
       <label className="ml-2 block text-sm text-gray-900">
-        Laporkan ke Telegram
+        Report to Telegram
       </label>
     </div>
     
@@ -209,7 +209,7 @@ const SettingsPage: React.FC = () => {
         className="h-4 w-4 text-slate-700 focus:ring-slate-700 border-gray-300 rounded"
       />
       <label className="ml-2 block text-sm text-gray-900">
-        Batasi akses pengirim
+        Restrict sender access
       </label>
     </div>
   </div>
@@ -217,7 +217,7 @@ const SettingsPage: React.FC = () => {
   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6">
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-1">
-        Minimal Karakter
+        Minimum Characters
       </label>
       <input
         type="number"
@@ -229,7 +229,7 @@ const SettingsPage: React.FC = () => {
     
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-1">
-        Jam Aktif Bot
+        Bot Active Hours
       </label>
       <div className="flex space-x-2">
         <input
@@ -270,7 +270,7 @@ const SettingsPage: React.FC = () => {
       onClick={handleSaveBotSettings}
       className="px-4 py-2 bg-slate-700 text-white rounded-md hover:bg-slate-600"
     >
-      Simpan Pengaturan Bot
+      Save Bot Settings
     </button>
     </div>
   </div>
