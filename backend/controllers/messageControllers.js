@@ -2,7 +2,26 @@ const Message = require('../models/MessageModel');
 
 const getMessages = async (req, res) => {
   try {
-    const messages = await Message.find();
+    const { category, fraudType, date, search } = req.query;
+    
+    let query = {};
+    
+    if (category) query.category = category;
+    if (fraudType) query.fraudType = fraudType;
+    if (date) {
+      const startDate = new Date(date);
+      startDate.setUTCHours(0, 0, 0, 0);
+      
+      const endDate = new Date(date);
+      endDate.setUTCHours(23, 59, 59, 999);
+      
+      query.detectionDate = { $gte: startDate, $lte: endDate };
+    }
+    if (search) {
+      query.$text = { $search: search };
+    }
+    
+    const messages = await Message.find(query).sort({ detectionDate: -1 });
     
     const formattedMessages = messages.map(msg => ({
       id: msg.id, 

@@ -39,5 +39,6 @@ const MessageSchema = new mongoose.Schema({
 
 MessageSchema.index({ category: 1, fraudType: 1 });
 MessageSchema.index({ detectionDate: -1 });
+MessageSchema.index({ content: 'text' });
 
 module.exports = mongoose.model('Message', MessageSchema);

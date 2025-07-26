@@ -26,7 +26,7 @@ const FeedbackPage: React.FC = () => {
                 <div className="mt-6 space-y-4">
                     <div>
                         <label htmlFor="messageId" className="block text-sm font-medium text-gray-700">Select message ID</label>
-                        <input type="text" id="messageId" className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm placeholder-gray-500" placeholder="e.g., MSG001" />
+                        <input type="text" id="messageId" className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm placeholder-gray-500" placeholder="e.g., WEB000 / TG000" />
                     </div>
                     <div>
                         <label htmlFor="messagePreview" className="block text-sm font-medium text-gray-700">Preview message</label>
