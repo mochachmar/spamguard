@@ -86,8 +86,41 @@ const deleteMessage = async (req, res) => {
   }
 };
 
+const updateMessage = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { category, fraudType, content } = req.body;
+
+    const validCategories = ['Fraud', 'SPAM', 'Hoax', 'Mencurigakan'];
+    const validFraudTypes = ['Phishing', 'Malware', 'Scams', 'Other'];
+
+    if (!validCategories.includes(category)) {
+      return res.status(400).json({ message: 'Kategori tidak valid' });
+    }
+
+    if (!validFraudTypes.includes(fraudType)) {
+      return res.status(400).json({ message: 'Tipe fraud tidak valid' });
+    }
+
+    const updatedMessage = await Message.findOneAndUpdate(
+      { id },
+      { category, fraudType, content },
+      { new: true }
+    );
+
+    if (!updatedMessage) {
+      return res.status(404).json({ message: 'Pesan tidak ditemukan' });
+    }
+
+    res.json(updatedMessage);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 module.exports = {
   getMessages,
   createMessage,
-  deleteMessage
+  deleteMessage,
+  updateMessage
 };

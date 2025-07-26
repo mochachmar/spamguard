@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Message } from '../../types';
 import { SearchIcon, ChevronDownIcon } from '../components/icons/InterfaceIcons';
+import { useNavigate } from 'react-router-dom';
 
 const categoryColors: { [key: string]: string } = {
     'Fraud': 'bg-red-100 text-red-800',
@@ -27,8 +28,9 @@ const FraudTypeBadge: React.FC<{ fraudType: Message['fraudType'] }> = ({ fraudTy
     const baseClasses = "px-3 py-1 text-xs font-semibold rounded-full leading-tight";
     return <span className={`${baseClasses} ${badgeStyle}`}>{fraudType}</span>;
 }
-
 const MessageDetails: React.FC<{ message: Message | null; onDelete: (id: string) => void }> = ({ message, onDelete }) => {
+    const navigate = useNavigate();
+
     if (!message) {
         return (
             <div className="bg-white p-6 rounded-lg shadow-sm h-full flex items-center justify-center">
@@ -61,7 +63,12 @@ const MessageDetails: React.FC<{ message: Message | null; onDelete: (id: string)
                 )}
             </div>
             <div className="flex justify-end space-x-3 mt-8">
-                <button className="px-4 py-2 bg-slate-700 text-white text-sm font-medium rounded-md hover:bg-slate-600">Edit</button>
+                <button 
+                    onClick={() => navigate('/feedback', { state: { messageToEdit: message } })}
+                    className="px-4 py-2 bg-slate-700 text-white text-sm font-medium rounded-md hover:bg-slate-600"
+                    >
+                    Edit
+                    </button>
                 <button 
                     onClick={() => message && onDelete(message.id)} 
                     className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-500"
