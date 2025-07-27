@@ -90,17 +90,17 @@ const GuidesPage: React.FC = () => {
             <GuideCard 
               icon={<ExclamationCircleIcon className="h-6 w-6 text-slate-600" />}
               title="Mengenali Upaya Phishing"
-              description="Pelajari cara mengidentifikasi dan menghindari email dan situs web phishing yang mencoba mencuri informasi Anda."
+              description="Kenali ciri-ciri phishing biar nggak tertipu. Misalnya, kamu dapat email yang katanya dari bank, tapi minta klik link aneh dan isi data pribadi — itu patut dicurigai. Perhatikan alamat pengirim, ejaan yang janggal, atau permintaan mendesak yang nggak masuk akal. Jangan asal klik atau kasih info, cek dulu kebenarannya."
             />
             <GuideCard 
               icon={<LockClosedIcon className="h-6 w-6 text-slate-600" />}
               title="Membuat Kata Sandi yang Kuat"
-              description="Ikuti praktik terbaik untuk membuat kata sandi yang kuat dan aman untuk melindungi akun Anda."
+              description="Biar akunmu nggak gampang dibobol, pakai kata sandi yang kuat. Hindari yang simpel kayak 123456 atau namakamu123. Gunakan kombinasi huruf besar, huruf kecil, angka, dan simbol. Misalnya: B!ruku_2025 — gampang diingat tapi susah ditebak. Jangan pakai info pribadi seperti tanggal lahir, dan usahakan beda password untuk tiap akun."
             />
             <GuideCard 
               icon={<ShieldCheckIcon className="h-6 w-6 text-slate-600" />}
               title="Melindungi Informasi Pribadi Anda"
-              description="Pahami cara melindungi data pribadi Anda dari spam dan aktivitas berbahaya."
+              description="Jaga informasi pribadimu kayak kamu jaga dompet — jangan sembarangan dibagikan. Jangan posting KTP, kartu vaksin, atau nomor telepon di media sosial. Kalau ada aplikasi atau situs yang minta data pribadi, pastikan itu resmi dan aman. Contoh: jangan langsung kasih NIK cuma karena 'dapat hadiah', apalagi kalau link-nya mencurigakan."
             />
           </GuideSection>
         </div>

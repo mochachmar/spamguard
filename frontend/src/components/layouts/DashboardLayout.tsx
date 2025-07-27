@@ -52,7 +52,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ onLogout }) => {
             <Link to="/settings">
               <img 
                 className="h-9 w-9 rounded-full object-cover cursor-pointer" 
-                src="https://i.pravatar.cc/150?u=a042581f4e29026704d" 
+                src="https://media.wired.com/photos/6703eb3979f13fda7f04485b/1:1/w_1667,h_1667,c_limit/Satoshi-Nakamoto-biz-1341874258.jpg" 
                 alt="User profile picture" 
               />
             </Link>

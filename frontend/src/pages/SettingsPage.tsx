@@ -279,7 +279,7 @@ const SettingsPage: React.FC = () => {
         <h2 className="text-xl font-bold text-gray-900 border-b pb-4">Admin Profile</h2>
         <div className="pt-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-8">
-                <img className="h-24 w-24 rounded-full" src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="Profile" />
+                <img className="h-24 w-24 rounded-full" src="https://media.wired.com/photos/6703eb3979f13fda7f04485b/1:1/w_1667,h_1667,c_limit/Satoshi-Nakamoto-biz-1341874258.jpg" alt="Profile" />
                 <div className="flex-grow">
                     <p className="text-lg font-bold text-gray-800">Moch Achmar</p>
                     <p className="text-sm text-gray-500">mochachmar@gmail.com</p>
