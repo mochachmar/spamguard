@@ -55,6 +55,10 @@ bot.on('message', async (msg) => {
       '🔍 Kirimkan pesan teks/gambar untuk analisis deteksi penipuan!\nSaya akan cek: Fraud, Spam, Promo, atau Pesan Normal.'
     );
   }
+
+  if (msg.text === '/guides') {
+    return sendGuides(chatId);
+  }
   
   if (msg.text) {
     const settings = await Setting.findOne();
@@ -207,6 +211,56 @@ async function analyzeMessage(chatId, userInput, imageFilename = null, msg) {
     });
     
     bot.sendMessage(chatId, '⚠️ Gagal menganalisis pesan. Pesan telah dicatat sebagai mencurigakan.');
+  }
+}
+
+async function sendGuides(chatId) {
+  try {
+    const guides = `
+<b>📚 PANDUAN SPAMGUARD & TIPS ANTI-SPAM</b>
+
+<b>Tutorial Penggunaan SpamGuard</b>
+<i>Pelajari cara mengatur dan mengonfigurasi SpamGuard untuk kinerja optimal</i>
+
+• <b>Memulai dengan SpamGuard</b>
+  Pelajari cara mengatur dan mengonfigurasi SpamGuard untuk kinerja optimal
+
+• <b>Memahami Laporan Spam</b>
+  Jelajahi laporan spam terperinci untuk menganalisis dan meningkatkan deteksi spam Anda
+
+• <b>Menyesuaikan Filter Spam</b>
+  Sesuaikan pengaturan filter spam Anda untuk memenuhi kebutuhan spesifik Anda
+
+<b>Tips Menghindari Spam</b>
+<i>Panduan praktis melindungi diri dari spam</i>
+
+• <b>Mengenali Upaya Phishing</b>
+  Kenali ciri-ciri phishing:
+  - Permintaan klik link aneh
+  - Ejaan janggal
+  - Permintaan mendesak tak masuk akal
+  <i>Contoh: Email palsu dari bank minta verifikasi</i>
+
+• <b>Membuat Kata Sandi Kuat</b>
+  Gunakan kombinasi:
+  - Huruf besar/kecil
+  - Angka
+  - Simbol (!@#$)
+  <i>Contoh: B!ruku_2025</i>
+
+• <b>Melindungi Informasi Pribadi</b>
+  - Jangan bagikan KTP/nomor telepon
+  - Verifikasi situs sebelum beri data
+  - Waspada hadiah menggiurkan
+`;
+
+    await bot.sendMessage(chatId, guides, { 
+      parse_mode: 'HTML',
+      disable_web_page_preview: true
+    });
+  } catch (error) {
+    console.error('Error sending guides:', error);
+    await bot.sendMessage(chatId, '⚠️ Gagal memuat panduan. Silakan coba lagi nanti.');
   }
 }
 
