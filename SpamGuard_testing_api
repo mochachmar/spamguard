@@ -1,0 +1,278 @@
+{
+	"info": {
+		"_postman_id": "4f1feeea-f6db-4eda-bec2-35ed5f039549",
+		"name": "SpamGuard",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42348142"
+	},
+	"item": [
+		{
+			"name": "AI",
+			"item": [
+				{
+					"name": "Upload Images",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/uploads/upload",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"uploads",
+								"upload"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deteksi AI",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"prompt\": \"🍔 BURGERAN HEMAT!\\nBeli 2 GRATIS 1 di seluruh outlet Burger Mantap setiap hari Jumat!\\n🕒 Berlaku pukul 15.00–18.00, hanya hingga 2 Agustus!\\n📍Cek lokasi terdekat & tukarkan promo di: burgermantap.id/deals\\n\\n(Reply STOP untuk berhenti terima promo)\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/ai/generate",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"ai",
+								"generate"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Dashboard",
+			"item": [
+				{
+					"name": "Dashboard",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/dashboard.stats",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"dashboard.stats"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Message",
+			"item": [
+				{
+					"name": "Data Message",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/messsages/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"messsages",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Message",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/messages/[id]",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"messages",
+								"[id]"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Settings",
+			"item": [
+				{
+					"name": "Bot Setting",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/setting/settings",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"setting",
+								"settings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Bot Setting",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/setting/update/settings",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"setting",
+								"update",
+								"settings"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Feedback",
+			"item": [
+				{
+					"name": "Preview Image",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/messages/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"messages",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Performance Data",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/dashboard/stats",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"dashboard",
+								"stats"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Image",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/uploads/upload",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"uploads",
+								"upload"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mark As Spam",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/messages/[id]",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"messages",
+								"[id]"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mark As Not Spam",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/messages/[id]",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"messages",
+								"[id]"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
