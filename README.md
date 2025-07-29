@@ -116,7 +116,7 @@ Bot akan otomatis berjalan bersamaan dengan backend.
 | GET    | `/messages`                  | Semua pesan yang dianalisis           | -                                                            |
 | DELETE | `/messages/:id`              | Hapus pesan berdasarkan ID            | -                                                            |
 | GET    | `/settings`                  | Ambil konfigurasi pengaturan saat ini | -                                                            |
-| POST   | `/settings`                  | Update konfigurasi pengaturan         | `{ "spamThreshold": 75, "blockedKeywords": "promo,diskon" }` |
+| POST   | `/settings`                  | Update konfigurasi pengaturan         | `{ "spamThreshold": 75}`                                     |
 
 
 <h2>Team Overview 👥</h2>
