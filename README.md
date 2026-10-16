@@ -1,4 +1,4 @@
-# 🛡️ SpamGuard by Quasar: AI-Powered Protection Against Digital Scams for Most Vulnerable Businesses
+# 🛡️ SpamGuard by Team Quasar AI 3-2: AI-Powered Protection Against Digital Scams for Most Vulnerable Businesses
 
 **SpamGuard** adalah aplikasi web cerdas yang dirancang untuk mendeteksi pesan spam menggunakan kecerdasan buatan (AI). Aplikasi ini menyediakan dashboard interaktif dan terintegrasi dengan Web dan Bot Telegram untuk notifikasi pesan serta analisis pesan secara real-time.
 
